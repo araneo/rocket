@@ -1,7 +1,6 @@
 require 'eventmachine'
 require 'em-websocket'
 require 'logging'
-require 'redis'
 
 module OpenAudit
   module WebSocket
