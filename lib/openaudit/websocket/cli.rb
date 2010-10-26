@@ -11,10 +11,10 @@ module OpenAudit
       
       desc "Start server on given host and port"
       opt "config", :shortcut => "-c", :default => "/etc/openaudit/websocket.conf"
-      def start
+      def start(*channels)
         EM.run do
-          config = OpenAudit::WebSocket.load_config(params["config"])
-          OpenAudit::WebSocket.start(config)
+          config = OpenAudit::WebSocket.load_config(params["config"]) or exit(1)
+          OpenAudit::WebSocket.start(channels, config)
         end
       end
       

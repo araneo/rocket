@@ -7,44 +7,25 @@ module OpenAudit
   module WebSocket
   
     autoload :Connection, "openaudit/websocket/connection"
+    autoload :Transports, "openaudit/websocket/transports"
     autoload :CLI,        "openaudit/websocket/cli"
   
-    def self.start(options, &blk)
-      host = options.delete(:host)
-      port = options.delete(:port)
-      redis_options = options.delete(:redis)
+    def self.start(channels, opts, &blk)
+      host = opts.delete(:host)
+      port = opts.delete(:port)
       
-      begin
-        logger.add_appenders(Logging.appenders.stdout)
-        logger.add_appenders(Logging.appenders.file(options[:log])) if options[:log]
-        logger.level = options[:log_level].to_sym if options[:log_level]
-      rescue Object => ex
-        logger.error ex.to_s
-        exit(4)
-      end
-      
-      begin
-        @redis_channels = redis_options.delete(:channels) || []
-        @redis = Redis.new(redis_options)
-      rescue Object => ex
-        logger.error ex.to_s
-        exit(3)
-      end
+      setup_logger(opts.delete(:logger) || {}) or exit(4)
       
       EM.epoll
       EM.run do
         trap("TERM") { stop }
         trap("INT")  { stop }
         
-        @redis_channels.each do |chan|
-          logger.debug "Subscribing Redis' pubsub channel: #{chan}"
-          EM.defer do
-            @redis.subscribe(chan) {|on| on.message {|c,msg| channel.push msg } }
-          end
-        end
-
-        logger.debug "Starting web socket server at #{host}:#{port}"
-        EM::start_server(host, port, Connection, options, &blk)
+        transport = Transports.get_transport(self, opts.delete(:transport) || {}) or exit(3)
+        transport.subscribe(channels)
+        
+        logger.debug "Web socket server is listening on #{host}:#{port} (CTRL+C to stop)"
+        EM::start_server(host, port, Connection, opts, &blk)
       end
     rescue Object => ex
       logger.error ex.to_s
@@ -69,11 +50,18 @@ module OpenAudit
       @channel ||= EM::Channel.new
     end
     
+    def self.setup_logger(options)
+      logger.add_appenders(Logging.appenders.file(options[:file])) if options[:file]
+      logger.level = options[:log].to_sym if options[:level]
+      true
+    rescue Object => ex
+      logger.error ex.to_s and false
+    end
+    
     def self.load_config(file)
       options = YAML.load_file(file)
     rescue Errno::ENOENT => ex
-      logger.error ex.to_s
-      exit(1)
+      logger.error ex.to_s and false
     end
     
   end # WebSocket
