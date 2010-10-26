@@ -1,15 +1,16 @@
 #!/usr/bin/env ruby
 
+# XXX: remove this
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 
 trap("TERM") { exit(0) }
 trap("INT")  { exit(0) }
 
 begin
-  require "openaudit-websocket"
+  require "rocket"
 rescue LoadError
   require "rubygems"
-  require "openaudit-websocket"
+  require "rocket"
 end
 
-OpenAudit::WebSocket::CLI.dispatch(ARGV)
+Rocket::CLI.dispatch(ARGV)

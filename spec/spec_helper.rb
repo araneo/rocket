@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'rubygems'
 require 'mocha'
 require 'rspec'
-require 'openaudit/websocket'
+require 'rocket'
 
 RSpec.configure do |config|
   config.mock_with :mocha
