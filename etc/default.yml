@@ -1,0 +1,12 @@
+:host: localhost
+:port: 9772
+#:log: /var/log/openaudit/websocket.log
+#:log_level: debug
+
+:redis:
+  :host: localhost
+  :port: 6379
+  :database: 0
+  :thread_safe: true
+  :channels: 
+  - test

@@ -6,7 +6,7 @@ require File.expand_path("../lib/openaudit/websocket/version", __FILE__)
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.version = OpenAudit::Reporter.version
+    gem.version = OpenAudit::WebSocket.version
     gem.name = "openaudit-websocket"
     gem.email = "krzysztof.kowalik@araneo.pl"
     gem.homepage = "https://github.com/araneo/openaudit-websocket"

@@ -1,5 +1,5 @@
 module OpenAudit
-  module Websocket
+  module WebSocket
     module Version # :nodoc:
       MAJOR  = 0
       MINOR  = 0
@@ -10,5 +10,5 @@ module OpenAudit
     def self.version # :nodoc:
       Version::STRING
     end # Version
-  end # Websocket
+  end # WebSocket
 end # OpenAudit

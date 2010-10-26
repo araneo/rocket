@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+
+trap("TERM") { exit(0) }
+trap("INT")  { exit(0) }
+
+begin
+  require "openaudit-websocket"
+rescue LoadError
+  require "rubygems"
+  require "openaudit-websocket"
+end
+
+OpenAudit::WebSocket::CLI.dispatch(ARGV)
