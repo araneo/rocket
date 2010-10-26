@@ -1,18 +1,18 @@
 require 'rubygems'
 require 'rake'
 
-require File.expand_path("../lib/openaudit/websocket/version", __FILE__)
+require File.expand_path("../lib/rocket/version", __FILE__)
 
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.version = OpenAudit::WebSocket.version
-    gem.name = "openaudit-websocket"
-    gem.email = "krzysztof.kowalik@araneo.pl"
-    gem.homepage = "https://github.com/araneo/openaudit-websocket"
-    gem.authors = ["Araneo"]
-    gem.summary = %Q{OpenAudit websockets server.}
-    gem.description = %Q{Websocket server for OpenAudit website.}
+    gem.version = Rocket.version
+    gem.name = "rocket"
+    gem.email = "chris@nu7hat.ch"
+    gem.homepage = "https://github.com/araneo/rocket"
+    gem.authors = ["Araneo", "Kriss Kowalik"]
+    gem.summary = %Q{Fast and extensible websocket server for Ruby.}
+    gem.description = %Q{Rocket is a fast websocket server which supports many different transports (like XMPP, AMQP or Redis).}
     gem.add_dependency "optitron", "~> 0.2"
     gem.add_dependency "json", "~> 1.4"
     gem.add_dependency "eventmachine", "~> 0.12"
@@ -43,7 +43,7 @@ task :default => :spec
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "OpenAudit Websocket #{OpenAudit::Websocket.version}"
+  rdoc.title = "Rocket #{Rocket.version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
