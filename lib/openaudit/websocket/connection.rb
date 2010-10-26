@@ -11,6 +11,10 @@ module OpenAudit
             logger.debug "Disconnecting subscriber ##{@sessid}" 
             channel.unsubscribe(@sessionid)
           }
+          onmessage {
+            logger.debug "New message received: #{msg}" 
+            channel.push msg
+          }
           logger.debug "Connecting subscriber ##{@sessid}"
         end
       end
