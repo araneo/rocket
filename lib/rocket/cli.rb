@@ -9,11 +9,13 @@ module Rocket
     end
     
     desc "Start server on given host and port"
-    opt "config", :shortcut => "-c", :default => "/etc/rocket/default.yml"
-    def start(*channels)
+    #opt "config", :shortcut => "-c", :default => "/etc/rocket/default.yml"
+    opt "host", :shortcut => "-h", :default => "localhost"
+    opt "port", :shortcut => "-p", :default => 9772
+    def start
       EM.run do
-        config = Rocket.load_config(params["config"]) or exit(1)
-        Rocket.start(channels, config)
+        params.each {|k,v| params[k.to_sym] = v }
+        Rocket.start(params)
       end
     end
     
