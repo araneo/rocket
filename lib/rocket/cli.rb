@@ -5,7 +5,7 @@ module Rocket
   
     desc "Show current Rocket version"
     def version
-      puts "Rocket v#{OpenAudit::WebSocket.version}"
+      puts "Rocket v#{Rocket.version}"
     end
     
     desc "Start server on given host and port"
