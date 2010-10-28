@@ -5,6 +5,10 @@ describe Rocket::Server do
     Rocket::Server
   end
   
+  before do
+    stub_logger
+  end
+  
   describe "#stop" do
     it "should stop EventMachine reactor" do
       EM.expects(:stop)

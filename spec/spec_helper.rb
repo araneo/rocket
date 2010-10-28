@@ -10,6 +10,14 @@ RSpec.configure do |config|
   config.mock_with :mocha
 end
 
+def stub_logger
+  Rocket.log.stubs(:debug)
+  Rocket.log.stubs(:error)
+  Rocket.log.stubs(:info)
+  Rocket.log.stubs(:fatal)
+  Rocket.log.stubs(:warn)
+end
+
 def capture_output
   out, err = StringIO.new, StringIO.new
   begin

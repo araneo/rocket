@@ -6,6 +6,7 @@ describe Rocket::Connection do
   end
 
   before do
+    stub_logger
     Rocket.instance_variable_set("@apps", {"test-app" => {"secret" => "my-secret"}})
   end
   
@@ -20,11 +21,11 @@ describe Rocket::Connection do
   end
   
   describe "#onopen" do
-    
     context "when valid app specified in request" do
       it "should start new session for it" do
-        conn = subject.new({})
+        conn = subject.new(1)
         conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        conn.request.stubs(:"[]").with("Query").returns({})
         conn.onopen
         session = conn.session
         session.should be_kind_of(Rocket::Session)
@@ -34,10 +35,22 @@ describe Rocket::Connection do
     
     context "when invalid app specified in request" do
       it "should close connection with client" do
-        conn = subject.new({})
+        conn = subject.new(1)
         conn.request.expects(:"[]").with("Path").returns("/app/non-existing-app")
+        conn.request.stubs(:"[]").with("Query").returns({})
         conn.expects(:close_connection)
         conn.onopen
+      end
+    end
+    
+    context "when valid secret given in request query" do
+      it "should start new session and authenticate it" do
+        conn = subject.new(1)
+        conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        conn.request.stubs(:"[]").with("Query").returns("secret" => "my-secret")
+        conn.onopen
+        session = conn.session
+        session.should be_authenticated
       end
     end
   end
@@ -45,8 +58,9 @@ describe Rocket::Connection do
   describe "#onclose" do
     context "when session is active" do
       it "should close it" do
-        conn = subject.new({})
+        conn = subject.new(1)
         conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        conn.request.stubs(:"[]").with("Query").returns({})
         conn.onopen
         conn.session.expects(:close)
         conn.onclose
@@ -55,7 +69,7 @@ describe Rocket::Connection do
     
     context "when session is not active" do
       it "should do nothing" do
-        conn = subject.new({})
+        conn = subject.new(1)
         conn.onclose.should be_nil
       end
     end
@@ -65,8 +79,8 @@ describe Rocket::Connection do
     it "should log given error" do
       conn = Rocket::Connection.new(1)
       conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      conn.request.stubs(:"[]").with("Query").returns({})
       conn.onopen
-      Rocket.log.expects(:error).with("Socket error (test-app): test error here")
       conn.onerror("test error here")
     end
   end
@@ -75,6 +89,7 @@ describe Rocket::Connection do
     subject do 
       conn = Rocket::Connection.new(1)
       conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      conn.request.stubs(:"[]").with("Query").returns({})
       conn.onopen
       conn
     end
@@ -111,7 +126,6 @@ describe Rocket::Connection do
     context "when given message is invalid JSON" do
       it "should log proper error" do
         conn = subject
-        Rocket.log.expects(:error).with("Invalid event data (test-app): \"{invalid JSON here}\"")
         conn.onmessage("{invalid JSON here}")
       end
     end
@@ -122,6 +136,7 @@ describe Rocket::Connection do
       it "should be true" do
         conn = subject.new(1)
         conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        conn.request.stubs(:"[]").with("Query").returns({})
         conn.onopen
         conn.should be_session
       end
@@ -139,6 +154,7 @@ describe Rocket::Connection do
     before do
       @conn = subject.new(1)
       @conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      @conn.request.stubs(:"[]").with("Query").returns({})
       @conn.onopen
     end
     
@@ -160,6 +176,7 @@ describe Rocket::Connection do
     before do
       @conn = subject.new(1)
       @conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      @conn.request.stubs(:"[]").with("Query").returns({})
       @conn.onopen
     end
     
@@ -174,5 +191,43 @@ describe Rocket::Connection do
         @conn.unsubscribe!({"channello" => "test-channel"}).should be_false
       end
     end
+  end
+  
+  describe "#trigger!" do
+    before do 
+      @conn = subject.new(1)
+      @conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      @conn.request.stubs(:"[]").with("Query").returns({})
+      @conn.onopen
+    end
+    
+    context "when session is not authenticated" do
+      it "should log proper error" do
+        data = {"event" => "test", "channel" => "testing"}
+        @conn.trigger!(data)
+      end
+    end
+    
+    context "when session is authenticated" do
+      before do
+        @conn.session.authenticate!("my-secret")
+      end
+      
+      context "when event data is valid" do
+        it "should broadcast it on given channel" do
+          data = {"event" => "test", "channel" => "testing"}
+          Rocket::Channel["test-app" => "testing"].expects(:push).with(data.to_json)
+          @conn.trigger!(data)
+        end
+      end
+      
+      context "when event data is invalid" do
+        it "should log proper error" do
+          data = {"evento" => "test", "channello" => "testing"}
+          @conn.trigger!(data)
+        end
+      end
+    end
+    
   end
 end
