@@ -4,7 +4,7 @@ require 'logging'
 
 module Rocket
   autoload :Connection, "rocket/connection"
-  autoload :Channels,   "rocket/channels"
+  autoload :Channel,    "rocket/channel"
   autoload :Session,    "rocket/session"
   autoload :CLI,        "rocket/cli"
 

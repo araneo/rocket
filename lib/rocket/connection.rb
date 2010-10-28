@@ -9,10 +9,6 @@ module Rocket
       onmessage(&method(:process_message!))
     end
     
-    def channels
-      @channels ||= Channels.new(self)
-    end
-    
     def process_message!(msg)
       if msg = JSON.parse(msg) and @session
         if data = msg["subscribe"]
@@ -32,10 +28,14 @@ module Rocket
       if @session.authenticated?
         puts "publishing event #{data["name"]}"
         channel_name, *_ = data.values_at("channel", "event")
-        channels[channel_name].push(data.to_json)
+        Channel[{ self => channel_name }].push({"publish" => data}.to_json)
       else
         puts "unauthorized to publish"
       end
+    end
+    
+    def app_id
+      request["Query"]["app_id"]
     end
     
     def start_session
@@ -45,7 +45,7 @@ module Rocket
     
     def close_session
       puts "session closed"
-      @session.close if @sessions 
+      @session.close if @session
     end
   end # Connection
 end # Rocket

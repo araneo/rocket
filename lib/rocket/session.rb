@@ -5,29 +5,26 @@ module Rocket
     def initialize(connection)
       @connection = connection
       @subscriptions = {}
-      authenticate!(*@connection.request["Query"].values_at('appid', 'secret'))
+      authenticate!(*@connection.request["Query"].values_at('app_id', 'app_secret'))
     end
     
     def authenticated?
       !!@authenticated
     end
     
-    def subscribe(channel_name)
-      puts "subscribing channel: #{channel_name}"
-      channel = Channel[channel_name]
-      sessid = channel.subscribe {|msg| @connection.send(msg) }
-      subscriptions[sessid] = channel
+    def authenticate!(id, secret)
+      puts "authenticated session for: #{id}"
+      @authenticated = (Rocket.available_apps[id] == secret)
     end
     
-    def authenticate!(appid, secret)
-      puts "authenticated session for: #{appid}"
-      @authenticated = (Rocket.available_apps[appid] == secret)
+    def subscribe(channel)
+      sid = Channel[{connection => channel}].subscribe {|msg| connection.send(msg) }
+      subscriptions[sid] = channel
+      sid
     end
     
     def close
-      subscriptions.each {|sessid, channel| 
-        channel.unsubscribe(sessid) if channel && sessid
-      }
+      subscriptions.each {|sid, channel| Channel[{connection => channel}].unsubscribe(sid) }
     end
   end # Session
 end # Rocket
