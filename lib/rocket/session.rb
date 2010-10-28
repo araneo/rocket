@@ -1,30 +1,46 @@
 module Rocket
   class Session
     attr_reader :subscriptions
+    attr_reader :app_id
     
-    def initialize(connection)
-      @connection = connection
+    def initialize(app_id)
+      @app = Rocket::App.find(app_id)
       @subscriptions = {}
-      authenticate!(*@connection.request["Query"].values_at('app_id', 'app_secret'))
     end
     
+    # Returns object of current application.
+    def app
+      @app ||= Rocket::App.find(app_id)
+    end
+    
+    # Returns id of current application. 
+    def app_id
+      @app.id
+    end
+    
+    # Returns +true+ when current session is authenticated with secret key.
     def authenticated?
       !!@authenticated
     end
     
-    def authenticate!(id, secret)
-      puts "authenticated session for: #{id}"
-      @authenticated = (Rocket.available_apps[id] == secret)
+    # Authenticate current session with your secret key. 
+    def authenticate!(secret)
+      @authenticated = (app.secret == secret)
     end
     
-    def subscribe(channel)
-      sid = Channel[{connection => channel}].subscribe {|msg| connection.send(msg) }
+    # Subscribes specified channel by given connected client. 
+    #
+    #   subscribe("my-awesome-channel", connection) # => subscription ID
+    #
+    def subscribe(channel, connection)
+      sid = Channel[app_id => channel].subscribe {|msg| connection.send(msg) }
       subscriptions[sid] = channel
       sid
     end
     
+    # Close current session and kill all active subscriptions.
     def close
-      subscriptions.each {|sid, channel| Channel[{connection => channel}].unsubscribe(sid) }
+      subscriptions.each {|sid, channel| Channel[app_id => channel].unsubscribe(sid) }
     end
   end # Session
 end # Rocket

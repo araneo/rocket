@@ -6,6 +6,7 @@ module Rocket
   autoload :Connection, "rocket/connection"
   autoload :Channel,    "rocket/channel"
   autoload :Session,    "rocket/session"
+  autoload :App,        "rocket/app"
   autoload :CLI,        "rocket/cli"
 
   def self.start(opts, &blk)

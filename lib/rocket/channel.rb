@@ -4,6 +4,7 @@ module Rocket
     #
     #   Channel["my-app" => "testing-channel"] # => #<Rocket::Channel>
     #   Channel["my-another-app" => "next-one"]
+    #
     def self.[](id)
       app, name = id.to_a.flatten
       channels[[app, name]] ||= new
