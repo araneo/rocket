@@ -26,8 +26,15 @@ module Rocket
     EM.stop
   end
   
-  def self.available_apps
-    { 'test' => 'secret' }
+  def self.load_apps(file)
+    apps = {}
+    File.read(file).split(/$/).each {|entry|
+      entry
+    }
+  end
+  
+  def self.apps
+    #@apps ||= load_apps(self.config.apps_file)
   end
   
   #def self.logger
