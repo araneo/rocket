@@ -6,7 +6,7 @@ module Rocket
     class << self
       # Returns list of all registered apps. 
       def all
-        Rocket.apps.to_a.map {|id,app| new(app.merge('id' => id)) }
+        Rocket.static_apps.to_a.map {|id,app| new(app.merge('id' => id)) }
       end
       
       # Returns given app if such is registered.
@@ -15,7 +15,7 @@ module Rocket
       #   Rocket::App.find("not-registered-app") # raises Rocket::App::NotFoundError
       #
       def find(app_id)
-        if app = Rocket.apps[app_id] 
+        if app = Rocket.static_apps[app_id] 
           new(app.merge('id' => app_id))
         else 
           raise NotFoundError, "Application #{app_id.inspect} does not exist!"

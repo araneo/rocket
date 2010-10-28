@@ -11,26 +11,20 @@ module Rocket
   autoload :Session,    "rocket/session"
   autoload :App,        "rocket/app"
 
-  def self.load_apps(file)
-    apps = {}
-    File.read(file).split(/$/).each {|entry|
-      entry
-    }
-  end
+  class << self
+    def static_apps
+      @apps
+    end
   
-  def self.apps
-    @apps
-    #@apps ||= load_apps(self.config.apps_file)
-  end
-  
-  #def self.logger
-  #  @logger ||= begin
-  #    logger = Logging.logger["WebSocket"]
-  #    logger.add_appenders(Logging.appenders.stdout)
-  #    logger.level = :debug
-  #    logger
-  #  end
-  #end
+    def log
+      unless @log
+        @log = Logging.logger["Rocket"]
+        @log.add_appenders(Logging.appenders.stdout)
+        @log.level = :debug
+      end
+      @log
+    end
+  end # << self
   
   #def self.setup_logger(options)
   #  logger.add_appenders(Logging.appenders.file(options[:file])) if options[:file]

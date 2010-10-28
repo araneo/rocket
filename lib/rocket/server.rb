@@ -1,6 +1,6 @@
 module Rocket
   module Server
-    def self.start(opts, &blk)
+    def self.start(opts={}, &blk)
       host = opts.delete(:host) || 'localhost'
       port = opts.delete(:port) || 9772
 
@@ -9,6 +9,7 @@ module Rocket
         trap("TERM") { stop }
         trap("INT")  { stop }
         
+        Rocket.log.debug("Starting Rocket server at #{host}:#{port}")
         EM::start_server(host, port, Connection, opts, &blk)
       end
     end

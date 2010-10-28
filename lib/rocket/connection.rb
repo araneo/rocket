@@ -3,6 +3,8 @@ module Rocket
     # Only connections to path matching this pattern will be accepted.
     APP_PATH_PATTERN = /^\/app\/(.*)(\?|\/)?.*/
     
+    attr_reader :session
+    
     def initialize(options={})
       super(options)
       @onopen = method(:onopen)
@@ -26,7 +28,7 @@ module Rocket
     
     # Handler websocket's of runtime errors. 
     def onerror(reason)
-      
+      Rocket.log.error("Socket error (#{app_id}): #{reason}")
     end
     
     # Dispatches the received message.
@@ -36,11 +38,11 @@ module Rocket
           when "rocket:subscribe"   then subscribe!(message)
           when "rocket:unsubscribe" then unsubscribe!(message)
         else
-          publish_event!(message)
+          trigger!(message)
         end
       end
     rescue JSON::ParserError
-      # INVALID MESSAGE FORMAT!
+      Rocket.log.error("Invalid event data (#{app_id}): #{message.inspect}")
     end
     
     # Returns true if session is open. 
@@ -48,15 +50,18 @@ module Rocket
       !!@session
     end
     
+    # Handles subscription event. 
     def subscribe!(data)
       data["channel"] ? @session.subscribe(data["channel"], self) : false
     end
     
+    # Handles unsubscribe event.
     def unsubscribe!(data)
       data["channel"] ? @session.unsubscribe(data["channel"], self) : false
     end
     
-    def publish_event!(data)
+    # Publishes given message. 
+    def trigger!(data)
       if session? and session.authenticated?
         channel, event = data.values_at("channel", "event")
         # XXX: check subscriptions here
@@ -64,6 +69,10 @@ module Rocket
       else
         # UNAUTHORIZED!
       end
+    end
+    
+    def app_id
+      session? ? session.app_id : "unknown"
     end
   end # Connection
 end # Rocket
