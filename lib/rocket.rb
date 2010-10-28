@@ -1,6 +1,7 @@
 require 'eventmachine'
 require 'em-websocket'
 require 'logging'
+require "json"
 
 module Rocket
   autoload :CLI,        "rocket/cli"

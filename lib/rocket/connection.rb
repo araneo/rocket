@@ -1,5 +1,3 @@
-require "json"
-
 module Rocket
   class Connection < EM::WebSocket::Connection
     # Only connections to path matching this pattern will be accepted.
@@ -31,17 +29,12 @@ module Rocket
       
     end
     
-    # Dispatches received messages.
+    # Dispatches the received message.
     def onmessage(message)
-      if session? and message = JSON.parse(msg)
-        data, event = message.values_at("data", "event")
-        
-        case event
-          #when "rocket:open"        then
-          #when "rocket:close"       then
-          #when "rocket:error"       then
-          when "rocket:subscribe"   then subscribe_channel(data)
-          when "rocket:unsubscribe" then unsubscribe_channel(data)
+      if session? and message = JSON.parse(message)
+        case message["event"]
+          when "rocket:subscribe"   then subscribe!(message)
+          when "rocket:unsubscribe" then unsubscribe!(message)
         else
           publish_event!(message)
         end
@@ -55,13 +48,22 @@ module Rocket
       !!@session
     end
     
+    def subscribe!(data)
+      data["channel"] ? @session.subscribe(data["channel"], self) : false
+    end
+    
+    def unsubscribe!(data)
+      data["channel"] ? @session.unsubscribe(data["channel"], self) : false
+    end
+    
     def publish_event!(data)
       if session? and session.authenticated?
         channel, event = data.values_at("channel", "event")
+        # XXX: check subscriptions here
         Channel[session.app_id => channel].push(data.to_json)
       else
         # UNAUTHORIZED!
       end
-    end   
+    end
   end # Connection
 end # Rocket

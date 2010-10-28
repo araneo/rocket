@@ -2,7 +2,7 @@ require File.expand_path("../spec_helper", __FILE__)
 
 describe Rocket::Session do
   let(:mock_app) do
-    mock("Rocket::App")
+    stub(:id => "test")
   end
   
   subject do
@@ -59,14 +59,52 @@ describe Rocket::Session do
   end
   
   describe "#subscribe" do
-    it "should subscribe given channel for given connection" do
-      pending
+    before do
+      @conn = stub(:signature => 123)
+      Rocket::Channel["test" => "test-channel"].expects(:subscribe).returns(234)
+      @session = subject
+    end
+    
+    it "should subscribe given channel" do
+      @session.subscribe("test-channel", @conn).should == 234
+    end
+    
+    it "should store subscription on list" do
+      @session.subscribe("test-channel", @conn)
+      @session.subscriptions.should have(1).item
+      @session.subscriptions["test-channel" => 123].should == 234
+    end
+  end
+  
+  describe "#unsubscribe" do
+    before do
+      @conn = stub(:signature => 123)
+      Rocket::Channel["test" => "test-channel"].expects(:unsubscribe).with(234)
+      @session = subject
+      @session.stubs(:subscriptions).returns({{"test-channel" => 123} => 234})
+    end
+    
+    it "should unsubscribe given channel" do
+      @session.unsubscribe("test-channel", @conn)
+    end
+    
+    it "should remove subscription from list" do
+      @session.unsubscribe("test-channel", @conn)
+      @session.subscriptions.should_not have_key("test-channel" => 123)
     end
   end
   
   describe "#close" do
+    before do
+      @conn = stub(:signature => 123)
+    end    
+    
     it "should unsubscibe all active subscriptions" do
-      pending
+      @session = subject
+      @session.stubs(:subscriptions).returns({{"test-channel" => 123} => 234})
+      Rocket::Channel["test" => "test-channel"].expects(:unsubscribe).with(234)
+      @session.close
+      @session.subscriptions.should be_empty
     end
   end
 end

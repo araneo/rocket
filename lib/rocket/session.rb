@@ -1,16 +1,11 @@
 module Rocket
   class Session
     attr_reader :subscriptions
-    attr_reader :app_id
+    attr_reader :app
     
     def initialize(app_id)
       @app = Rocket::App.find(app_id)
       @subscriptions = {}
-    end
-    
-    # Returns object of current application.
-    def app
-      @app ||= Rocket::App.find(app_id)
     end
     
     # Returns id of current application. 
@@ -34,13 +29,26 @@ module Rocket
     #
     def subscribe(channel, connection)
       sid = Channel[app_id => channel].subscribe {|msg| connection.send(msg) }
-      subscriptions[sid] = channel
+      subscriptions[channel => connection.signature] = sid
       sid
+    end
+    
+    # Unsubscribes specified channel for given client.
+    #
+    #   unsubscribe("my-awesome-channel", connection)
+    #
+    def unsubscribe(channel, connection)
+      if sid = subscriptions.delete(channel => connection.signature)
+        Channel[app_id => channel].unsubscribe(sid)
+      end
     end
     
     # Close current session and kill all active subscriptions.
     def close
-      subscriptions.each {|sid, channel| Channel[app_id => channel].unsubscribe(sid) }
+      subscriptions.keys.each do |id| 
+        channel, sig = id.to_a.flatten
+        Channel[app_id => channel].unsubscribe(subscriptions.delete(channel => sig))
+      end
     end
   end # Session
 end # Rocket

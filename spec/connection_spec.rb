@@ -60,6 +60,56 @@ describe Rocket::Connection do
     end
   end
   
+  describe "#onerror" do
+    it "should log given error" do
+      pending
+    end
+  end
+  
+  describe "#onmessage" do
+    subject do 
+      conn = Rocket::Connection.new({})
+      conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+      conn.onopen
+      conn
+    end
+  
+    context "when given message is valid JSON" do
+      context "for rocket:subscribe message" do
+        it "should process it" do
+          conn = subject
+          message = {"event" => "rocket:subscribe", "channel" => "my-test-one"}
+          conn.expects(:subscribe!).with(instance_of(Hash))
+          conn.onmessage(message.to_json)
+        end
+      end
+      
+      context "for rocket:unsubscribe message" do
+        it "should process it" do
+          conn = subject
+          message = {"event" => "rocket:unsubscribe", "channel" => "my-test-one"}
+          conn.expects(:unsubscribe!).with(instance_of(Hash))
+          conn.onmessage(message.to_json)
+        end
+      end
+      
+      context "for other message" do
+        it "should process it" do
+          conn = subject
+          message = {"channel" => "my-test-chan", "event" => "my-test-even", "data" => {"foo" => "bar"}}
+          conn.expects(:publish_event!).with(instance_of(Hash))
+          conn.onmessage(message.to_json)
+        end
+      end
+    end
+    
+    context "when given message is invalid JSON" do
+      it "should log proper error" do
+        pending
+      end
+    end
+  end
+  
   describe "#session?" do
     context "when current session exists" do
       it "should be true" do
