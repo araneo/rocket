@@ -59,7 +59,7 @@ describe Rocket::Session do
   end
   
   describe "#subscribe" do
-    it "should subscribe given channel for current app" do
+    it "should subscribe given channel for given connection" do
       pending
     end
   end

@@ -3,29 +3,13 @@ require 'em-websocket'
 require 'logging'
 
 module Rocket
+  autoload :CLI,        "rocket/cli"
+  autoload :Server,     "rocket/server"
   autoload :Connection, "rocket/connection"
   autoload :Channel,    "rocket/channel"
   autoload :Session,    "rocket/session"
   autoload :App,        "rocket/app"
-  autoload :CLI,        "rocket/cli"
 
-  def self.start(opts, &blk)
-    host = opts.delete(:host) || 'localhost'
-    port = opts.delete(:port) || 9772
-
-    EM.epoll
-    EM.run do
-      trap("TERM") { stop }
-      trap("INT")  { stop }
-      
-      EM::start_server(host, port, Connection, opts, &blk)
-    end
-  end
-  
-  def self.stop
-    EM.stop
-  end
-  
   def self.load_apps(file)
     apps = {}
     File.read(file).split(/$/).each {|entry|
@@ -34,6 +18,7 @@ module Rocket
   end
   
   def self.apps
+    @apps
     #@apps ||= load_apps(self.config.apps_file)
   end
   
