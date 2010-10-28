@@ -53,6 +53,17 @@ describe Rocket::Connection do
         session.should be_authenticated
       end
     end
+    
+    context "when invalid or no secret given" do
+      it "shouldn't authenticate session" do
+        conn = subject.new(1)
+        conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        conn.request.stubs(:"[]").with("Query").returns("secret" => "fooobar")
+        conn.onopen
+        session = conn.session
+        session.should_not be_authenticated
+      end
+    end
   end
   
   describe "#onclose" do
