@@ -12,6 +12,7 @@ module Rocket
     attr_reader :host
     attr_reader :port
     attr_reader :pidfile
+    attr_reader :daemon
     
     def initialize(options={})
       @host    = options[:host] || 'localhost'
@@ -22,7 +23,7 @@ module Rocket
     end
   
     def start!(&blk)
-      if @daemon
+      if daemon
         daemonize!(&blok)
       else
         EM.epoll
@@ -42,7 +43,7 @@ module Rocket
     end
     
     def kill!
-      pid = File.read(@pidfile).chomp.to_i
+      pid = File.read(pidfile).chomp.to_i
       FileUtils.rm pidfile
       Process.kill(9, pid)
       puts "Rocket server killed (PID: #{pid})"
@@ -66,8 +67,8 @@ module Rocket
     end
     
     def save_pid
-      FileUtils.mkdir_p(File.dirname(@pidfile))
-      File.open(pid_path, "w+"){|f| f.write("#{Process.pid}\n")}
+      FileUtils.mkdir_p(File.dirname(pidfile))
+      File.open(pidfile, "w+"){|f| f.write("#{Process.pid}\n")}
     rescue => e
       puts e.to_s
       exit 1
