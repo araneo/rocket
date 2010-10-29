@@ -115,8 +115,5 @@ module Rocket
       session? ? session.app_id : "unknown"
     end
     
-    def log_messages
-      LOG_MESSAGES
-    end
   end # Connection
 end # Rocket

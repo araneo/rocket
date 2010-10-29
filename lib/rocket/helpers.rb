@@ -16,7 +16,7 @@ module Rocket
     %w[ info debug warn error fatal ].each do |level|
       define_method(level) do |*args|
         message = args.shift
-        message = log_messages[message] if message.is_a?(Symbol)
+        message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
         log.send(level).call(message % args) unless ENV['ROCKET_ENV'] == 'test'
       end
     end
