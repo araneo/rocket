@@ -4,22 +4,22 @@ module Rocket
     include Helpers
     
     LOG_MESSAGES = {
-      :opening_connection    => "(%s, %d) Opening new connection...",
-      :closing_connection    => "(%s, %d) Closing connection...",
-      :auth_success          => "(%s, %d) Session authenticated successfully!",
-      :auth_error            => "(%s, %d) Authentication error! Invalid secret key.",
-      :app_not_found_error   => "(%s, %d) %s",
-      :web_socket_error      => "(%s, %d) Web socket error: %s",
-      :invalid_json_error    => "(%s, %d) Invalid event's data! This is not valid JSON: %s",
-      :subscribing_channel   => "(%s, %d) Subscribing the '%s' channel.",
-      :unsubscribing_channel => "(%s, %d) Unsubscribing the '%s' channel.",
-      :trigger_error         => "(%s, %d) Invalid event's data! No channel or event name specified in: %s",
-      :access_denied_error   => "(%s, %d) Action can't be performed, access denied!",
-      :trigger_success       => "(%s, %d) Triggering '%s' on '%s' channel: %s",
+      :app_not_found_error   => "#%d : %s",
+      :opening_connection    => "%s #%d : Opening new connection...",
+      :closing_connection    => "%s #%d : Closing connection...",
+      :auth_success          => "%s #%d : Session authenticated successfully!",
+      :auth_error            => "%s #%d : Authentication error! Invalid secret key.",
+      :web_socket_error      => "%s #%d : Web socket error: %s",
+      :invalid_json_error    => "%s #%d : Invalid event's data! This is not valid JSON: %s",
+      :subscribing_channel   => "%s #%d : Subscribing the '%s' channel.",
+      :unsubscribing_channel => "%s #%d : Unsubscribing the '%s' channel.",
+      :trigger_error         => "%s #%d : Invalid event's data! No channel or event name specified in: %s",
+      :access_denied_error   => "%s #%d : Action can't be performed, access denied!",
+      :trigger_success       => "%s #%d : Triggering '%s' on '%s' channel: %s",
     }
   
     # Only connections to path matching this pattern will be accepted.
-    APP_PATH_PATTERN = /^\/app\/(.*)(\?|\/)?.*/
+    APP_PATH_PATTERN = /^\/app\/([\d\w\-\_]+)/
     
     attr_reader :session
     
@@ -29,6 +29,7 @@ module Rocket
       @onclose = method(:onclose)
       @onmessage = method(:onmessage)
       @onerror = method(:onerror)
+      @debug = Rocket.debug
     end
     
     # Starts new session for application specified in request path.
@@ -47,7 +48,7 @@ module Rocket
         end
       end
     rescue Rocket::App::NotFoundError => ex
-      error(:app_not_found_error, app_id, signature, ex.to_s)
+      error(:app_not_found_error, signature, ex.to_s)
       close_connection
     end
     
@@ -102,7 +103,7 @@ module Rocket
       if session? and session.authenticated?
         channel, event = data.values_at("channel", "event")
         if channel and event
-          info(:trigger_success, app_id, signature, event, channel, data.inspect)
+          debug(:trigger_success, app_id, signature, event, channel, data.inspect)
           return Channel[session.app_id => channel].push(data.to_json)
         end
         error(:trigger_error, app_id, signature, data.inspect)

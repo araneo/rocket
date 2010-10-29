@@ -5,7 +5,7 @@ module Rocket
     
     LOG_MESSAGES = {
       :starting_server => "Rocket server started listening at %s:%s (CTRL+C to stop)",
-      :stopping_server => "Stopping Rocket setver..."
+      :stopping_server => "Stopping Rocket server..."
     }
     
     attr_reader :options
@@ -31,26 +31,27 @@ module Rocket
           trap("TERM") { stop! }
           trap("INT")  { stop! }
           
-          debug(:starting_server, host, port.to_s)
+          info(:starting_server, host, port.to_s)
           EM::start_server(host, port, Connection, options, &blk)
         end
       end
     end
     
     def stop!
-      debug(:stopping_server)
+      puts
+      info(:stopping_server)
       EM.stop
     end
     
     def kill!
-      pid = File.read(pidfile).chomp.to_i
-      FileUtils.rm pidfile
-      Process.kill(9, pid)
-      puts "Rocket server killed (PID: #{pid})"
+      if File.exists?(pidfile)
+        pid = File.read(pidfile).chomp.to_i
+        FileUtils.rm pidfile
+        Process.kill(9, pid)
+        pid
+      end
     rescue => e
       puts e
-    ensure
-      exit
     end
     
     def daemonize!(&blk)

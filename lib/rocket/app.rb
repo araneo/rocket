@@ -19,7 +19,7 @@ module Rocket
         if app = Rocket.apps[app_id] 
           new(app.merge('id' => app_id))
         else 
-          raise NotFoundError, "Application #{app_id.inspect} does not exist!"
+          raise NotFoundError, "Application '#{app_id}' does not exist!"
         end
       end
     end # << self

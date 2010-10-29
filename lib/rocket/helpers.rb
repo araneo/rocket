@@ -25,9 +25,13 @@ module Rocket
     
     %w[ info debug warn error fatal ].each do |level|
       define_method(level) do |*args|
-        message = args.shift
-        message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
-        log.send(level).call(message % args) unless ENV['ROCKET_ENV'] == 'test'
+        if args.first.kind_of?(Array) # Support for EM::WebSocket#debug
+          super(*args)
+        elsif ENV['ROCKET_ENV'] != 'test' # Don't print logs while testing
+          message = args.shift
+          message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
+          log.send(level, message % args)
+        end
       end
     end
     

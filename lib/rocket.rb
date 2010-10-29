@@ -21,7 +21,7 @@ module Rocket
   class << self
   
     def apps
-      @apps ||= {}
+      @apps ||= settings[:apps] || {}
     end
   
     def logger
@@ -34,14 +34,14 @@ module Rocket
     
     alias :konfigurator_load_settings :load_settings
     
-    def load_settings(file, overwrites={})
-      konfigurator_load_settings(settings, false)
-      settings.merge!(overwrites)
+    def load_settings(file, local_settings={})
+      konfigurator_load_settings(file, false)
+      settings.merge!(local_settings)
       configure_logger
       require_plugins
       true
     rescue => ex
-      puts ex
+      puts ex.to_s
       exit 1
     end
     
@@ -57,9 +57,9 @@ module Rocket
       debug    = settings.delete(:debug)
       quiet    = settings.delete(:quiet)
       
-      logger.add_appenders(Logging.adapters.file(logfile)) if logfile
+      logger.add_appenders(Logging.appenders.file(logfile)) if logfile
       logger.level = :debug if debug
-      logger.level = :fatal if !debug and quiet
+      logger.level = :error if !debug and quiet
       
       true
     end
@@ -67,7 +67,7 @@ module Rocket
     def default_logger
       logger = Logging.logger["Rocket"]
       logger.add_appenders(Logging.appenders.stdout)
-      logger.level = :debug
+      logger.level = :info
       logger
     end
   end # << self 
