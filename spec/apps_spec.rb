@@ -2,7 +2,7 @@ require File.expand_path("../spec_helper", __FILE__)
 
 describe Rocket::App do
   subject do 
-    Rocket.expects(:static_apps).returns({"test-app" => {"secret" => "my-secret"}})
+    Rocket.expects(:apps).returns({"test-app" => {"secret" => "my-secret"}})
     Rocket::App
   end
   

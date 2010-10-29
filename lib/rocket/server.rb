@@ -4,34 +4,73 @@ module Rocket
     include Helpers
     
     LOG_MESSAGES = {
-      :server_start => "Rocket server started listening at %s:%s (CTRL+C to stop)",
-      :server_stop  => "Stopping Rocket setver..."
+      :starting_server => "Rocket server started listening at %s:%s (CTRL+C to stop)",
+      :stopping_server => "Stopping Rocket setver..."
     }
     
     attr_reader :options
     attr_reader :host
     attr_reader :port
+    attr_reader :pidfile
     
     def initialize(options={})
+      @host    = options[:host] || 'localhost'
+      @port    = options[:port] || 9772
+      @pidfile = options.delete(:pid) || "/var/run/rocket/server.pid"
+      @daemon  = options.delete(:daemon)
       @options = options
-      @host = options.delete(:host) || 'localhost'
-      @port = options.delete(:port) || 9772
     end
   
-    def start(&blk)
-      EM.epoll
-      EM.run do
-        trap("TERM") { stop }
-        trap("INT")  { stop }
-        
-        debug(:server_start, host, port.to_s)
-        EM::start_server(host, port, Connection, options, &blk)
+    def start!(&blk)
+      if @daemon
+        daemonize!(&blok)
+      else
+        EM.epoll
+        EM.run do
+          trap("TERM") { stop! }
+          trap("INT")  { stop! }
+          
+          debug(:starting_server, host, port.to_s)
+          EM::start_server(host, port, Connection, options, &blk)
+        end
       end
     end
     
-    def stop
-      debug(:server_stop)
+    def stop!
+      debug(:stopping_server)
       EM.stop
+    end
+    
+    def kill!
+      pid = File.read(@pidfile).chomp.to_i
+      FileUtils.rm pidfile
+      Process.kill(9, pid)
+      puts "Rocket server killed (PID: #{pid})"
+    rescue => e
+      puts e
+    ensure
+      exit
+    end
+    
+    def daemonize!(&blk)
+      fork do
+        Process.setsid
+        exit if fork
+        save_pid
+        File.umask 0000
+        STDIN.reopen "/dev/null"
+        STDOUT.reopen "/dev/null", "a"
+        STDERR.reopen STDOUT
+        start!(&blk)
+      end
+    end
+    
+    def save_pid
+      FileUtils.mkdir_p(File.dirname(@pidfile))
+      File.open(pid_path, "w+"){|f| f.write("#{Process.pid}\n")}
+    rescue => e
+      puts e.to_s
+      exit 1
     end
     
   end # Server

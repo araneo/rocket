@@ -6,6 +6,7 @@ ENV['ROCKET_ENV'] = "test"
 require 'rubygems'
 require 'mocha'
 require 'rspec'
+require 'fileutils'
 require 'rocket'
 
 RSpec.configure do |config|

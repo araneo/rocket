@@ -1,5 +1,6 @@
 module Rocket
   class Session
+  
     attr_reader :subscriptions
     attr_reader :app
     
@@ -50,5 +51,6 @@ module Rocket
         Channel[app_id => channel].unsubscribe(subscriptions.delete(channel => sig))
       end
     end
+    
   end # Session
 end # Rocket

@@ -27,17 +27,17 @@ describe Rocket::Server do
     end
   end
   
-  describe "#stop" do
+  describe "#stop!" do
     it "should stop EventMachine reactor" do
       EM.expects(:stop)
-      subject.new.stop
+      subject.new.stop!
     end
   end
   
-  describe "#start" do
+  describe "#start!" do
     it "should start server on given host and port" do
       EM.expects(:start_server).with("test.host", 9992, Rocket::Connection, instance_of(Hash))
-      t = Thread.new { subject.new(:host => "test.host", :port => 9992).start }
+      t = Thread.new { subject.new(:host => "test.host", :port => 9992).start! }
       t.kill
     end
   end

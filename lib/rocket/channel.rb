@@ -1,5 +1,6 @@
 module Rocket
   class Channel < EM::Channel
+  
     # Get specfied channel for given app or create it if doesn't exist.
     #
     #   Channel["my-app" => "testing-channel"] # => #<Rocket::Channel>
@@ -14,5 +15,6 @@ module Rocket
     def self.channels
       @channels ||= {}
     end
+    
   end # Channels
 end # Rocket
