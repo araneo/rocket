@@ -10,36 +10,31 @@ module Rocket
   autoload :Channel,    "rocket/channel"
   autoload :Session,    "rocket/session"
   autoload :App,        "rocket/app"
+  autoload :Helpers,    "rocket/helpers"
 
   class << self
+  
     def static_apps
       @apps
     end
   
-    def log
-      unless @log
-        @log = Logging.logger["Rocket"]
-        @log.add_appenders(Logging.appenders.stdout)
-        @log.level = :debug
-      end
-      @log
+    def logger
+      @logger ||= default_logger
     end
-  end # << self
-  
-  #def self.setup_logger(options)
-  #  logger.add_appenders(Logging.appenders.file(options[:file])) if options[:file]
-  #  logger.level = options[:log].to_sym if options[:level]
-  #  true
-  #rescue Object => ex
-  #  logger.error ex.to_s and false
-  #end
-  
-  #def self.load_config(file)
-  #  options = YAML.load_file(file)
-  #rescue Errno::ENOENT => ex
-  #  logger.error ex.to_s and false
-  #end
-  
+    
+    def logger=(logger)
+      @logger = logger
+    end
+    
+    private
+    
+    def default_logger
+      logger = Logging.logger["Rocket"]
+      logger.add_appenders(Logging.appenders.stdout)
+      logger.level = :debug
+      logger
+    end
+  end # << self 
 end # Rocket
 
 require 'rocket/version'

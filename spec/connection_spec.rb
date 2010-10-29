@@ -6,7 +6,6 @@ describe Rocket::Connection do
   end
 
   before do
-    stub_logger
     Rocket.instance_variable_set("@apps", {"test-app" => {"secret" => "my-secret"}})
   end
   

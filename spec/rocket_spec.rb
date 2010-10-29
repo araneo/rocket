@@ -9,17 +9,26 @@ describe Rocket do
     subject.version.should =~ /\d+(.\d+){1,2}.*/
   end
   
-  describe "#log" do
-    subject do
-      Rocket.log
+  describe "#logger=" do
+    it "should set given logger" do
+      subject.logger = :testing
+      subject.instance_variable_get("@logger").should == :testing
+    end
+  end
+  
+  describe "#logger" do
+    before do
+      subject.instance_variable_set("@logger", nil) 
     end
     
-    it "should respond to all logger-specific methods" do
-      subject.should respond_to(:debug)
-      subject.should respond_to(:info)
-      subject.should respond_to(:error)
-      subject.should respond_to(:warn)
-      subject.should respond_to(:fatal)
+    it "should return default logger when other is not specified" do
+      subject.expects(:default_logger).returns(:test)
+      subject.logger.should == :test
+    end
+    
+    it "should return specified logger" do
+      subject.logger = :testing
+      subject.logger.should == :testing
     end
   end
 end

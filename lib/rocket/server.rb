@@ -1,9 +1,11 @@
 module Rocket
   module Server
     
-    MESSAGES = {
-      :SERVER_START => "Rocket server started listening at %s:%s (CTRL+C to stop)",
-      :SERVER_STOP  => "Stopping Rocket setver..."
+    extend Helpers
+    
+    LOG_MESSAGES = {
+      :server_start => "Rocket server started listening at %s:%s (CTRL+C to stop)",
+      :server_stop  => "Stopping Rocket setver..."
     }
   
     def self.start(opts={}, &blk)
@@ -15,14 +17,18 @@ module Rocket
         trap("TERM") { stop }
         trap("INT")  { stop }
         
-        Rocket.log.debug(MESSAGES[:SERVER_START] % [host, port.to_s])
+        debug(:server_start, host, port.to_s)
         EM::start_server(host, port, Connection, opts, &blk)
       end
     end
     
     def self.stop
-      Rocket.log.debug(MESSAGES[:SERVER_STOP])
+      debug(:server_stop)
       EM.stop
+    end
+    
+    def self.log_messages
+      LOG_MESSAGES
     end
   end # Server
 end # Rocket

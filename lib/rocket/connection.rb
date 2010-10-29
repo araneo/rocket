@@ -1,19 +1,21 @@
 module Rocket
   class Connection < EM::WebSocket::Connection
-
-    MESSAGES = {
-      :OPENING_CONNECTION  => "(%s, %d) Opening new connection...",
-      :CLOSING_CONNECTION  => "(%s, %d) Closing connection...",
-      :AUTH_SUCCESS        => "(%s, %d) Session authenticated successfully!",
-      :AUTH_ERROR          => "(%s, %d) Authentication error! Invalid secret key.",
-      :APP_NOT_FOUND_ERROR => "(%s, %d) %s",
-      :WEB_SOCKET_ERROR    => "(%s, %d) Web socket error: %s",
-      :EVENT_DATA_ERROR    => "(%s, %d) Invalid event's data! This is not valid JSON: %s",
-      :SUBSCRIBE_CHANNEL   => "(%s, %d) Subscribing the '%s' channel.",
-      :UNSUBSCRIBE_CHANNEL => "(%s, %d) Unsubscribing the '%s' channel.",
-      :TRIGGER_DATA_ERROR  => "(%s, %d) Invalid event's data! No channel or name specified: %s",
-      :TRIGGER_AUTH_ERROR  => "(%s, %d) Can't trigger event, access denied!",
-      :TRIGGER_SUCCESS     => "(%s, %d) Triggering '%s' on '%s' channel: %s",
+  
+    include Helpers
+    
+    LOG_MESSAGES = {
+      :opening_connection    => "(%s, %d) Opening new connection...",
+      :closing_connection    => "(%s, %d) Closing connection...",
+      :auth_success          => "(%s, %d) Session authenticated successfully!",
+      :auth_error            => "(%s, %d) Authentication error! Invalid secret key.",
+      :app_not_found_error   => "(%s, %d) %s",
+      :web_socket_error      => "(%s, %d) Web socket error: %s",
+      :invalid_json_error    => "(%s, %d) Invalid event's data! This is not valid JSON: %s",
+      :subscribing_channel   => "(%s, %d) Subscribing the '%s' channel.",
+      :unsubscribing_channel => "(%s, %d) Unsubscribing the '%s' channel.",
+      :trigger_error         => "(%s, %d) Invalid event's data! No channel or event name specified in: %s",
+      :access_denied_error   => "(%s, %d) Action can't be performed, access denied!",
+      :trigger_success       => "(%s, %d) Triggering '%s' on '%s' channel: %s",
     }
   
     # Only connections to path matching this pattern will be accepted.
@@ -32,31 +34,32 @@ module Rocket
     # Starts new session for application specified in request path.
     def onopen
       request["Path"] =~ APP_PATH_PATTERN
+      
       if @session = Session.new($1) 
-        Rocket.log.debug(MESSAGES[:OPENING_CONNECTION] % [app_id, signature])
+        debug(:opening_connection, app_id, signature)
         
         if secret = request["Query"]["secret"]
           if @session.authenticate!(secret)
-            Rocket.log.debug(MESSAGES[:AUTH_SUCCESS] % [app_id, signature])
+            debug(:auth_success, app_id, signature)
           else
-            Rocket.log.error(MESSAGES[:AUTH_ERROR] % [app_id, signature])
+            debug(:auth_error, app_id, signature)
           end
         end
       end
     rescue Rocket::App::NotFoundError => ex
-      Rocket.log.error(MESSAGES[:APP_NOT_FOUND_ERROR] % [app_id, signature, ex.to_s])
+      error(:app_not_found_error, app_id, signature, ex.to_s)
       close_connection
     end
     
     # Closes current session. 
     def onclose
-      Rocket.log.debug(MESSAGES[:CLOSING_CONNECTION] % [app_id, signature])
+      debug(:closing_connection, app_id, signature)
       @session.close and true if session?
     end
     
     # Handler websocket's of runtime errors. 
     def onerror(reason)
-      Rocket.log.debug(MESSAGES[:WEB_SOCKET_ERROR] % [app_id, signature, reason])
+      error(:web_socket_error, app_id, signature, reason)
     end
     
     # Dispatches the received message.
@@ -70,7 +73,7 @@ module Rocket
         end
       end
     rescue JSON::ParserError
-      Rocket.log.error(MESSAGES[:EVENT_DATA_ERROR] % [app_id, signature, message.inspect])
+      error(:invalid_json_error, app_id, signature, message.inspect)
     end
     
     # Returns true if session is open. 
@@ -81,7 +84,7 @@ module Rocket
     # Handles subscription event. 
     def subscribe!(data)
       if channel = data["channel"]
-        Rocket.log.debug(MESSAGES[:SUBSCRIBE_CHANNEL] % [app_id, signature, channel])
+        debug(:subscribing_channel, app_id, signature, channel)
         @session.subscribe(channel, self)
       end
     end
@@ -89,7 +92,7 @@ module Rocket
     # Handles unsubscribe event.
     def unsubscribe!(data)
       if channel = data["channel"]
-        Rocket.log.debug(MESSAGES[:UNSUBSCRIBE_CHANNEL] % [app_id, signature, channel])
+        debug(:unsubscribing_channel, app_id, signature, channel)
         @session.unsubscribe(channel, self)
       end
     end
@@ -99,18 +102,21 @@ module Rocket
       if session? and session.authenticated?
         channel, event = data.values_at("channel", "event")
         if channel and event
-          Channel[session.app_id => channel].push(data.to_json)
-          Rocket.log.info(MESSAGES[:TRIGGER_SUCCESS] % [app_id, signature, event, channel, data.inspect])
-        else
-          Rocket.log.info(MESSAGES[:TRIGGER_DATA_ERROR] % [app_id, signature, data.inspect])
+          info(:trigger_success, app_id, signature, event, channel, data.inspect)
+          return Channel[session.app_id => channel].push(data.to_json)
         end
+        error(:trigger_error, app_id, signature, data.inspect)
       else
-        Rocket.log.info(MESSAGES[:TRIGGER_AUTH_ERROR] % [app_id, signature, data.inspect])
+        error(:access_denied_error, app_id, signature)
       end
     end
     
     def app_id
       session? ? session.app_id : "unknown"
+    end
+    
+    def log_messages
+      LOG_MESSAGES
     end
   end # Connection
 end # Rocket
