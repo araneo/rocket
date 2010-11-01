@@ -12,13 +12,18 @@ begin
     gem.homepage = "https://github.com/araneo/rocket"
     gem.authors = ["Araneo", "Kriss Kowalik"]
     gem.summary = %Q{Fast and extensible websocket server for Ruby.}
-    gem.description = %Q{Rocket is a fast websocket server which supports many different transports (like XMPP, AMQP or Redis).}
+    gem.description = <<-DESC
+      Rocket is a very fast and reliable websocket server built upon em-websockets library.
+      Rocket provides also javascript toolkit to serve up instructions to clients. 
+      All Rocket's behaviors was strongly inspired by awesome PusherApp. 
+    DESC
     gem.add_dependency "optitron", "~> 0.2"
     gem.add_dependency "json", "~> 1.4"
     gem.add_dependency "eventmachine", ">= 0.12"
     gem.add_dependency "em-websocket", ">= 0.1.4"
     gem.add_dependency "logging", "~> 1.4"
     gem.add_dependency "daemons", "~> 1.1"
+    gem.add_dependency "konfigurator", ">= 0.1.1"
     gem.add_development_dependency "rspec", "~> 2.0"
     gem.add_development_dependency "mocha", "~> 0.9"
   end
