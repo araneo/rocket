@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-# XXX: remove this
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-
 trap("TERM") { exit(0) }
 trap("INT")  { exit(0) }
 
