@@ -7,7 +7,42 @@ describe Rocket::CLI do
 
   describe "#start" do
     it "should properly start server" do
-      pending
+      out, err = capture_output {
+        mock_server = mock(:start! => true)
+        Rocket.expects(:load_settings).with('test.yml', {
+          :verbose => false, :debug => false, :secure => false, :quiet => false, 
+          :pid => '/var/run/rocket/server.pid', :daemon => false, :host => 'localhost', 
+          :plugins => [], :port => 9772, :help => false
+        }).returns(true)
+        Rocket::Server.expects(:new).returns(mock_server)
+        subject.dispatch(%w[start -c test.yml])
+      }
+    end
+  end
+  
+  describe "#stop" do
+    context "when proper pidfile given" do
+      it "should kill that process" do
+        out, err = capture_output {
+          mock_server = mock(:kill! => 123)
+          Rocket.expects(:load_settings).with('test.yml', :pid => 'test.pid', :help => false).returns(true)
+          Rocket::Server.expects(:new).returns(mock_server)
+          subject.dispatch(%w[stop -c test.yml -P test.pid])
+        }
+        out.should == "Rocket server killed (PID: 123)\n"
+      end
+    end
+    
+    context "when invalid pid given" do
+      it "should do nothing" do
+        out, err = capture_output {
+          mock_server = mock(:kill! => false)
+          Rocket.expects(:load_settings).with('test.yml', :pid => 'test.pid', :help => false).returns(true)
+          Rocket::Server.expects(:new).returns(mock_server)
+          subject.dispatch(%w[stop -c test.yml -P test.pid])
+        }
+        out.should == "No processes were killed!\n"
+      end
     end
   end
   
