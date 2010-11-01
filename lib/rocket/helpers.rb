@@ -5,7 +5,8 @@ module Rocket
     #
     #   p symbolize_keys("hello" => "world", ["Array here"] => "yup")
     #   p symbolize_keys(:one => 1, "two" => 2)
-    # will produce:
+    #
+    # produces:
     #
     #  {:hello => "world", ["Array here"] => "yup"}
     #  {:one => 1, :two => 2}
@@ -24,14 +25,10 @@ module Rocket
     end
     
     %w[ info debug warn error fatal ].each do |level|
-      define_method(level) do |*args|
-        if args.first.kind_of?(Array) # Support for EM::WebSocket#debug
-          super(*args)
-        elsif ENV['ROCKET_ENV'] != 'test' # Don't print logs while testing
-          message = args.shift
-          message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
-          log.send(level, message % args)
-        end
+      define_method("log_#{level}") do |*args|
+        message = args.shift
+        message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
+        log.send(level, message % args)
       end
     end
     

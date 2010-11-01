@@ -18,6 +18,20 @@ module Rocket
 
   include Konfigurator::Simple
 
+  # Default settings
+  set :host, "localhost"
+  set :port, 9772
+  disable :debug
+  disable :secure
+  disable :verbose
+  disable :quiet
+  disable :daemon
+  set :pid, nil
+  set :log, nil
+  set :tls_options, {}
+  set :apps, []
+  set :plugins, []
+  
   class << self
   
     def apps
@@ -32,10 +46,8 @@ module Rocket
       @logger = logger
     end
     
-    alias :konfigurator_load_settings :load_settings
-    
-    def load_settings(file, local_settings={})
-      konfigurator_load_settings(file, false)
+    def load_settings_with_setup(file, local_settings={})
+      load_settings_without_setup(file, false)
       settings.merge!(local_settings)
       configure_logger
       require_plugins
@@ -44,23 +56,17 @@ module Rocket
       puts ex.to_s
       exit 1
     end
-    
-    private
+    alias_method :load_settings_without_setup, :load_settings
+    alias_method :load_settings, :load_settings_with_setup
     
     def require_plugins
-      plugins = settings.delete(:plugins).to_a
-      plugins.each {|plugin| require plugin }
+      plugins.to_a.each {|plugin| require plugin }
     end
     
     def configure_logger
-      logfile  = settings.delete(:log)
-      debug    = settings.delete(:debug)
-      quiet    = settings.delete(:quiet)
-      
-      logger.add_appenders(Logging.appenders.file(logfile)) if logfile
-      logger.level = :debug if debug
-      logger.level = :error if !debug and quiet
-      
+      logger.add_appenders(Logging.appenders.file(settings[:log])) if log
+      logger.level = :debug if verbose
+      logger.level = :error if !verbose and quiet
       true
     end
     

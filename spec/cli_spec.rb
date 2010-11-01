@@ -13,27 +13,37 @@ describe Rocket::CLI do
   
   describe "#version" do
     it "should display current version of Rocket server" do
-      STDOUT.stubs(:write)
-      subject.dispatch(%[version])
+      capture_output { subject.dispatch(%w[version]) }
     end
   end
   
   describe "#configure" do
     context "when no file name given" do
       it "should create rocket.yml file in current directory" do
-        begin
-          fname = File.join(Dir.pwd, "rocket.yml")
-          subject.dispatch(%[configure])
-          File.should be_exist(fname)
-        ensure
-          FileUtils.rm_rf(fname)
-        end
+        capture_output {
+          begin
+            fname = File.join(Dir.pwd, "rocket.yml")
+            subject.dispatch(%w[configure])
+            File.should be_exist(fname)
+          ensure
+            FileUtils.rm_rf(fname)
+          end
+        }
       end
     end
     
     context "when file name given" do
       it "should create it" do
-        
+        capture_output {
+          begin
+            fname = File.join(Dir.pwd, "tmp/test.yml")
+            FileUtils.mkdir_p(File.dirname(fname))
+            subject.dispatch(%w[configure tmp/test.yml])
+            File.should be_exist(fname)
+          ensure
+            FileUtils.rm_rf(File.dirname(fname))
+          end
+        }
       end
     end
   end

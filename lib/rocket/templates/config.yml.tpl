@@ -15,10 +15,6 @@ debug: true
 #daemon: true
 daemon: false
 
-# You can also specify process name, it will be used in PID filename
-# when it's not specified. 
-#name: my-instance
-
 # Specify path to server process' PID file. This option works only
 # when server is daemonized.  
 #pid: /var/run/rocket.pid

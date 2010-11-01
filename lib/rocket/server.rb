@@ -1,7 +1,10 @@
+require 'daemons'
+
 module Rocket
   class Server
     
     include Helpers
+    include Daemonize
     
     LOG_MESSAGES = {
       :starting_server => "Rocket server started listening at %s:%s (CTRL+C to stop)",
@@ -15,31 +18,37 @@ module Rocket
     attr_reader :daemon
     
     def initialize(options={})
-      @host    = options[:host] || 'localhost'
-      @port    = options[:port] || 9772
-      @pidfile = options.delete(:pid) || "/var/run/rocket/server.pid"
-      @daemon  = options.delete(:daemon)
-      @options = options
+      @options = options.dup
+      @host    = @options[:host] || 'localhost'
+      @port    = @options[:port] || 9772
+      @pidfile = @options.delete(:pid) || "/var/run/rocket/server.pid"
+      @daemon  = @options.delete(:daemon)
+      
+      # Remove unnecessary options. 
+      @options.delete(:verbose)
+      @options.delete(:quiet)
+      @options.delete(:log)
+      @options.delete(:apps)
+      @options.delete(:plugins)
     end
   
-    def start!(&blk)
+    def start!(&block)
       if daemon
-        daemonize!(&blok)
+        daemonize!(&block)
       else
         EM.epoll
         EM.run do
           trap("TERM") { stop! }
           trap("INT")  { stop! }
           
-          info(:starting_server, host, port.to_s)
-          EM::start_server(host, port, Connection, options, &blk)
+          log_info(:starting_server, host, port.to_s)
+          EM::start_server(host, port, Connection, options, &block)
         end
       end
     end
     
     def stop!
-      puts
-      info(:stopping_server)
+      log_info(:stopping_server)
       EM.stop
     end
     
@@ -51,20 +60,12 @@ module Rocket
         pid
       end
     rescue => e
-      puts e
+      # nothing to show
     end
     
-    def daemonize!(&blk)
-      fork do
-        Process.setsid
-        exit if fork
-        save_pid
-        File.umask 0000
-        STDIN.reopen "/dev/null"
-        STDOUT.reopen "/dev/null", "a"
-        STDERR.reopen STDOUT
-        start!(&blk)
-      end
+    def daemonize!(&block)
+      daemonize
+      start!(&block)
     end
     
     def save_pid

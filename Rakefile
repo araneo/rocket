@@ -15,9 +15,10 @@ begin
     gem.description = %Q{Rocket is a fast websocket server which supports many different transports (like XMPP, AMQP or Redis).}
     gem.add_dependency "optitron", "~> 0.2"
     gem.add_dependency "json", "~> 1.4"
-    gem.add_dependency "eventmachine", "~> 0.12"
+    gem.add_dependency "eventmachine", ">= 0.12"
     gem.add_dependency "em-websocket", ">= 0.1.4"
     gem.add_dependency "logging", "~> 1.4"
+    gem.add_dependency "daemons", "~> 1.1"
     gem.add_development_dependency "rspec", "~> 2.0"
     gem.add_development_dependency "mocha", "~> 0.9"
   end

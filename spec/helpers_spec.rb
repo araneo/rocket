@@ -14,11 +14,11 @@ describe Rocket::Helpers do
   end
   
   it "should respond to all log level-specific methods" do
-    subject.should respond_to(:info)
-    subject.should respond_to(:debug)
-    subject.should respond_to(:warn)
-    subject.should respond_to(:error)
-    subject.should respond_to(:fatal)
+    subject.should respond_to(:log_info)
+    subject.should respond_to(:log_debug)
+    subject.should respond_to(:log_warn)
+    subject.should respond_to(:log_error)
+    subject.should respond_to(:log_fatal)
   end
   
   describe "#symbolize_keys" do
