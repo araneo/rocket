@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+trap("TERM") { exit(0) }
+trap("INT")  { exit(0) }
+
+begin
+  require "rocket-server"
+rescue LoadError
+  require "rubygems"
+  require "rocket-server"
+end
+
+Rocket::CLI.dispatch(ARGV)

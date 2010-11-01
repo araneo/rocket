@@ -1,0 +1,3 @@
+module Rocket
+
+end
