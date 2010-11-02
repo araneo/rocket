@@ -1,50 +1,48 @@
-var Pusher = function(application_key, channel_name) {
-  this.path = '/app/' + application_key;
-  this.key = application_key;
-  this.socket_id;
-  this.channels = new Pusher.Channels();
-  this.global_channel = new Pusher.Channel()
-  this.global_channel.global = true;
-  this.secure = false;
+var Rocket = function(url, appID, channelName) {
+  this.socketId;
+  
+  this.url = url + '/app/' + appID;
+  this.appID = appID;
+  this.channels = new Rocket.Channels();
+  this.globalChannel = new Pusher.Channel();
+  this.globalChannel.global = true;
   this.connected = false;
-  this.retry_counter = 0;
+  this.retryCounter = 0;
+  this.allowReconnect = false;
+  
   this.connect();
 
-  if (channel_name) this.subscribe(channel_name);
+  if (channel_name) {
+    this.subscribe(channelName);
+  }
 
   var self = this;
 
-  //This is the new namespaced version
-  this.bind('pusher:connection_established', function(data) {
-    self.connected = true;
-    self.retry_counter = 0;
-    self.socket_id = data.socket_id;
-    self.subscribeAll();
-  });
+  //this.bind('pusher:connection_established', function(data) {
+  //  self.connected = true;
+  //  self.retry_counter = 0;
+  //  self.socket_id = data.socket_id;
+  //  self.subscribeAll();
+  //});
 
-  this.bind('pusher:error', function(data) {
-    Pusher.log("Pusher : error : " + data.message);
-  });
+  //this.bind('pusher:error', function(data) {
+  //  Pusher.log("Pusher : error : " + data.message);
+  //});
 };
 
 Pusher.prototype = {
-  channel: function(name) {
-    return this.channels.find(name);
+  channel: function(channelName) {
+    return this.channels.find(channelName);
   },
 
   connect: function() {
-    var url = "ws://" + Pusher.host + ":" + Pusher.ws_port + this.path;
-    if (this.secure == true){
-      url = "wss://" + Pusher.host + ":" + Pusher.wss_port + this.path;
-    }
-
-    Pusher.allow_reconnect = true;
-    Pusher.log('Pusher : connecting : ' + url );
+    Rocket.allowReconnect = true;
+    Pusher.log('Rocket : connecting : ' + Rocket.url);
 
     var self = this;
 
     if (window["WebSocket"]) {
-      this.connection = new WebSocket(url);
+      this.connection = new WebSocket(Rocket.url);
       this.connection.onmessage = function() {
         self.onmessage.apply(self, arguments);
       };
@@ -55,96 +53,60 @@ Pusher.prototype = {
         self.onopen.apply(self, arguments);
       };
     } else {
-      // Mock connection object if WebSockets are not available.
       this.connection = {};
-      setTimeout(function(){
-        self.send_local_event("pusher:connection_failed", {})
-        }, 3000)
+      //setTimeout(function(){
+      //  self.send_local_event("pusher:connection_failed", {})
+      //}, 3000)
     }
   },
 
-  toggle_secure: function() {
-    if (this.secure == false) {
-      this.secure = true;
-      Pusher.log("Pusher: switching to wss:// connection");
-    }else{
-      this.secure = false;
-      Pusher.log("Pusher: switching to ws:// connection");
-    };
-  },
-
-
   disconnect: function() {
-    Pusher.log('Pusher : disconnecting');
-    Pusher.allow_reconnect = false;
-    Pusher.retry_count = 0;
+    Pusher.log('Rocket : disconnecting');
+    Pusher.allowReconnect = false;
+    Pusher.retryCount = 0;
     this.connection.close();
   },
 
-  bind: function(event_name, callback) {
-    this.global_channel.bind(event_name, callback)
+  bind: function(eventName, callback) {
+    this.globalChannel.bind(eventName, callback);
     return this;
   },
 
-  bind_all: function(callback) {
-    this.global_channel.bind_all(callback)
+  bindAll: function(callback) {
+    this.globalChannel.bindAll(callback);
     return this;
   },
 
   subscribeAll: function() {
     for (var channel in this.channels.channels) {
-      if (this.channels.channels.hasOwnProperty(channel)) this.subscribe(channel);
-    }
+      if (this.channels.channels.hasOwnProperty(channel)) {
+        this.subscribe(channel);
+      }
+    };
   },
 
-  subscribe: function(channel_name) {
-    var channel = this.channels.add(channel_name);
+  subscribe: function(channelName) {
+    var channel = this.channels.add(channelName);
     
     if (this.connected) {
-      if (channel_name.indexOf("private-") === 0) {
-        var self = this;
-        var xhr = window.XMLHttpRequest ?
-          new XMLHttpRequest() :
-          new ActiveXObject("Microsoft.XMLHTTP");
-        xhr.open("POST", Pusher.channel_auth_endpoint, true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState == 4) {
-            if (xhr.status == 200) {
-              var data = JSON.parse(xhr.responseText);
-              self.trigger('pusher:subscribe', {
-                channel: channel_name,
-                auth: data.auth
-              });
-            } else {
-              Pusher.log("Couldn't get auth info from your webapp" + status);
-            }
-          }
-        };
-        xhr.send('socket_id=' + encodeURIComponent(this.socket_id) + '&channel_name=' + encodeURIComponent(channel_name));
-      } else {
-        this.trigger('pusher:subscribe', {
-          channel: channel_name
-        });
-      }
+      this.trigger('pusher:subscribe', { channel: channelName });
     }
     return channel;
   },
   
-  unsubscribe: function(channel_name) {
-    this.channels.remove(channel_name);
+  unsubscribe: function(channelName) {
+    this.channels.remove(channelName);
 
     if (this.connected) {
       this.trigger('pusher:unsubscribe', {
-        channel: channel_name
+        channel: channelName
       });
     }
   },
   
-  // Not currently supported by pusherapp.com
-  trigger: function(event_name, data) {
-    var payload = JSON.stringify({ 'event' : event_name, 'data' : data });
-    Pusher.log("Pusher : sending event : ", payload);
+  trigger: function(eventName, data) {
+    var payload = JSON.stringify({ 'event' : eventName, 'data' : data });
+    Pusher.log("Pusher : triggering event : ", payload);
     this.connection.send(payload);
     return this;
   },
@@ -210,7 +172,6 @@ Pusher.prototype = {
 
 // Pusher defaults
 
-Pusher.VERSION = "<%= VERSION %>";
 Pusher.host = "ws.pusherapp.com";
 Pusher.ws_port = 80;
 Pusher.wss_port = 443;
