@@ -4,10 +4,10 @@ trap("TERM") { exit(0) }
 trap("INT")  { exit(0) }
 
 begin
-  require "rocket-server"
+  require "rocket-js"
 rescue LoadError
   require "rubygems"
-  require "rocket-server"
+  require "rocket-js"
 end
 
-Rocket::Server::CLI.dispatch(ARGV)
+Rocket::JS::CLI.dispatch(ARGV)
