@@ -13,7 +13,10 @@ module Rocket
       opt "unminified", :short_name => "u", :default => false, :desc => "Generate unminified javascripts (not reccomendend for production)"
       def generate(dest="./")
         Rocket::JS::Builder.new(dest, !params[:unminified]).generate
-        puts "Rocket javascript lib saved to #{file}"
+        puts "Newly generated Rocket files has been placed in #{dest}"
+      rescue => ex
+        puts ex.to_s
+        exit(1)
       end
       
     end # CLI

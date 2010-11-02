@@ -15,6 +15,7 @@ module Rocket
         "vendor/web-socket-js/swfobject.js",
         "vendor/web-socket-js/FABridge.js",
         "vendor/web-socket-js/web_socket.js",
+        "rocket.channels.js", 
         "rocket.core.js",
       ]
 

@@ -1,13 +1,22 @@
-/*!
- * Pusher JavaScript Library v<%= VERSION %>
- * http://pusherapp.com/
+/**
+ * Rocket JavaScript Library v<%= VERSION %>
  *
- * Copyright 2010, New Bamboo
- * Released under the MIT licence.
+ * Copyright 2010, Araneo Ltd. <http://www.araneo.pl>
+ * Released under the MIT license.
+ *
+ * Author: Chris Kowalik <chris@nu7hat.ch>
  */
 
-/*
- * This library contains code with the following licences:
+/**
+ * This code is strongly inspired by and based on the Pusher JavaScript Library.
+ *
+ * Pusher JavaScript Library:
+ *
+ *   Copyright 2010, New Bamboo <http://new-bamboo.co.uk/>
+ *   Released under the MIT licence.
+ *   Reference: http://pusherapp.com
+ *
+ * This library contains also code with the following licences:
  *
  * web_socket.js:
  *
