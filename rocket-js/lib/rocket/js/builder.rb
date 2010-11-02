@@ -58,10 +58,12 @@ module Rocket
       
       def save_script(source)
         File.open(File.expand_path("rocket#{'.min' if minified}.js"), 'w+') {|f|
-          CONTENTS.each {|content|
-            f.write(File.read(File.expand_path("../../../../src/#{content}", __FILE__)))
-            f.write("\n\n")
-          }
+          contents = CONTENTS.each {|content|
+            File.read(File.expand_path("../../../../src/#{content}", __FILE__))
+          }.join("\n\n").sub(/<%= VERSION %>/, Rocket::JS.version)
+
+          f.write(contents)
+          f.write("\n\n")
           f.write(source)
         }
       end
