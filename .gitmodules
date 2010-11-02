@@ -1,0 +1,3 @@
+[submodule "rocket-js/src/vendor/web-socket-js"]
+	path = rocket-js/src/vendor/web-socket-js
+	url = http://github.com/gimite/web-socket-js.git
