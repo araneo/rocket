@@ -1,12 +1,11 @@
-LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 
 require 'rubygems'
 require 'sinatra'
 require 'erb'
-require 'rocket'
+require 'rocket-js'
 
-set :public, public_path = File.expand_path('../../dist/', __FILE__)
-Rocket::JS::Builder.new(public_path).generate
+Rocket::JS::Builder.new(File.expand_path("../public/rocket", __FILE__), false).generate
 
 get '/' do
   erb :index

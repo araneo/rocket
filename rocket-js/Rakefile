@@ -6,7 +6,7 @@ end
 
 desc 'Start test server.'
 task :test do
-  exec 'ruby test/app.rb'
+  exec 'ruby -I../rocket/lib test/app.rb'
 end
 
 task :default => :test

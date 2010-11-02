@@ -1,49 +1,107 @@
-Pusher.Channels = function() {
-  this.channels = {};
+/** 
+ * This object helps with channels management. Examples:
+ *
+ *   channels = new Rocket.Channels();
+ *   channels.add('test');
+ *   channels.find('test'); 
+ *   channels.remove('test');
+ *   // ...
+ */
+Rocket.Channels = function() {
+  this.all = {};
 };
 
-Pusher.Channels.prototype = {
-  add: function(channel_name) {
-    var existing_channel = this.find(channel_name);
-    if (!existing_channel) {
-      var channel = new Pusher.Channel();
-      this.channels[channel_name] = channel;
-      return channel;
+Rocket.Channels.prototype = {
+  /**
+   * Append new channel to the list of registered. 
+   */
+  add: function(channelName) {
+    existingChannel = this.find(channelName)
+    if (!existingChannel) {
+      return (this.all[channelName] = new Pusher.Channel());
     } else {
-      return existing_channel;
+      return existingChannel;
     }
   },
-
-  find: function(channel_name) {
-    return this.channels[channel_name];
+  
+  /**
+   * Returns channel with specified name when it exists. 
+   */
+  find: function(channelName) {
+    return this.all[channelName];
   },
-
-  remove: function(channel_name) {
-    delete this.channels[channel_name];
+  
+  /**
+   * Remove specified channel from the list.  
+   */
+  remove: function(channelName) {
+    delete this.all[channelName];
   }
 };
 
-Pusher.Channel = function() {
+/**
+ * Single channel. It keeps eg. list of callbacks for all binded events, 
+ * and helps with events dispatching. 
+ * 
+ *   channel = new Rocket.Channel();
+ *   channel.bind('my-event', function(data) {
+ *     // do something with given data ...
+ *   })
+ */
+Rocket.Channel = function() {
   this.callbacks = {};
-  this.global_callbacks = [];
+  this.globalCallbacks = [];
 };
 
+Rocket.Channel.prototype = function() {
+  /**
+   * Assign callback to given event. More than one callback can be assigned
+   * to one event, eg:
+   * 
+   *   channel.bind('my-event', function(data){ alert('first one!') });
+   *   channel.bind('my-event', function(data){ alert('second one!') }); 
+   */
+  bind: function(eventName, callback) {
+    this.callbacks[eventName] = this.callbacks[eventName] || [];
+    this.callbacks[eventName].push(callback);
+    return this;
+  },
+  
+  /**
+   * Creates global callback which will be invoked on all events just after
+   * processing callbacks assigned to it.
+   *
+   *   channel.bindAll(function(event, data){ alert(event) });
+   */
+  bindAll: function(callback) {
+    this.globalCallbacks.push(callback);
+    return this;
+  },
+  
+  /**
+   * Dispatch given event with passing data to all registered callbacks.
+   * All global callbacks will be called here too.
+   * 
+   *   channel.dispatch('my-event', {'hello': 'world'})
+   */
+  dispatch: function(eventName, eventData) {
+    var callbacks = this.callbacks[eventName]
+    if (callbacks) {
+      Rocket.log('Rocket : Executing callbacks for ' + eventName)
+      for (var i = 0; i < callbacks.length; i++) {
+        callbacks[i](eventData);
+      }
+    } else {
+      Rocket.log('Rocket : No callbacks for ' + eventName)
+    }
+    for (var i = 0; i < this.globalCallbacks.length; i+=) {
+      this.globalCallbacks[i](eventName, eventData);
+    }
+  }
+};
+
+/*
 Pusher.Channel.prototype = {
-  bind: function(event_name, callback) {
-    this.callbacks[event_name] = this.callbacks[event_name] || [];
-    this.callbacks[event_name].push(callback);
-    return this;
-  },
-
-  bind_all: function(callback) {
-    this.global_callbacks.push(callback);
-    return this;
-  },
-
-  dispatch_with_all: function(event_name, data) {
-    this.dispatch(event_name, data);
-    this.dispatch_global_callbacks(event_name, data);
-  },
 
   dispatch: function(event_name, event_data) {
     var callbacks = this.callbacks[event_name];
@@ -57,9 +115,5 @@ Pusher.Channel.prototype = {
     }
   },
 
-  dispatch_global_callbacks: function(event_name, event_data) {
-    for (var i = 0; i < this.global_callbacks.length; i++) {
-      this.global_callbacks[i](event_name, event_data);
-    }
-  }
 };
+*/

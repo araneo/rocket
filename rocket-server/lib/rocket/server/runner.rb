@@ -8,7 +8,7 @@ module Rocket
       include Daemonize
       
       LOG_MESSAGES = {
-        :starting_server => "Rocket server started listening at %s:%s (CTRL+C to stop)",
+        :starting_server => "Server is listening at %s:%s (CTRL+C to stop)",
         :stopping_server => "Stopping Rocket server..."
       }
       

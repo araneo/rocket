@@ -4,20 +4,18 @@ var Rocket = function(url, appID, channelName) {
   this.url = url + '/app/' + appID;
   this.appID = appID;
   this.channels = new Rocket.Channels();
-  this.globalChannel = new Pusher.Channel();
-  this.globalChannel.global = true;
   this.connected = false;
   this.retryCounter = 0;
-  this.allowReconnect = false;
   
   this.connect();
 
-  if (channel_name) {
-    this.subscribe(channelName);
+  if (channelName) {
+    //this.globalChannel = this.subscribe(channelName);
+    //this.globalChannel.isGlobal = true
   }
 
   var self = this;
-
+  
   //this.bind('pusher:connection_established', function(data) {
   //  self.connected = true;
   //  self.retry_counter = 0;
@@ -30,6 +28,11 @@ var Rocket = function(url, appID, channelName) {
   //});
 };
 
+// Rocket defaults
+Rocket.allowReconnect = true;
+Rocket.log = function(){}; // eg. function(m){ console.log(m) }
+
+/*
 Pusher.prototype = {
   channel: function(channelName) {
     return this.channels.find(channelName);
@@ -153,7 +156,7 @@ Pusher.prototype = {
       if (Pusher.allow_reconnect){
         Pusher.log('Pusher : Reconnecting in 5 seconds...');
         this.wait_and_reconnect(function(){}, time)
-      }
+    }
     } else {
       self.send_local_event("pusher:connection_failed", {});
       if (this.retry_counter == 0){
@@ -186,3 +189,4 @@ Pusher.parser = function(data) {
     return data;
   }
 };
+*/

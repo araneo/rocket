@@ -27,13 +27,13 @@ module Rocket
       attr_reader :dest
       attr_reader :minified
       
-      def new(dest, minified=true)
+      def initialize(dest, minified=true)
         @dest     = dest
         @minified = minified
       end
       
       def generate
-        File.mkdir_p(dest)
+        FileUtils.mkdir_p(dest)
         
         # Bundle all sources
         source = bundle
@@ -58,8 +58,9 @@ module Rocket
       end
       
       def save_script(source)
-        File.open(File.expand_path("rocket#{'.min' if minified}.js"), 'w+') {|f|
-          contents = CONTENTS.each {|content|
+        puts dest
+        File.open(File.expand_path("rocket#{'.min' if minified}.js", dest), 'w+') {|f|
+          contents = CONTENTS.map {|content|
             File.read(File.expand_path("../../../../src/#{content}", __FILE__))
           }.join("\n\n").sub(/<%= VERSION %>/, Rocket::JS.version)
 
@@ -71,8 +72,7 @@ module Rocket
       
       def copy_assets
         ASSETS.each {|asset|
-          src  = File.expand_path("../../../../src/#{script}", __FILE__)
-          dest = File.join(self.dest, File.basename(asset)) 
+          src  = File.expand_path("../../../../src/#{asset}", __FILE__)
           FileUtils.cp(src, dest)
         }
       end
