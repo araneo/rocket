@@ -24,7 +24,7 @@ begin
     g.authors = ["Araneo", "Chris Kowalik"]
     g.summary = SUMMARY
     g.description = DESCRIPTION
-    g.add_dependency "rocket-server", "0.1.1"
+    g.add_dependency "rocket-server", "0.0.1"
     g.add_dependency "rocket-js", "0.0.1"
     g.add_dependency "json", "~> 1.4"
     g.add_development_dependency "rspec", "~> 2.0"

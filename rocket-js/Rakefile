@@ -28,6 +28,7 @@ begin
     g.add_dependency "yui-compressor", "~> 0.9"
     g.add_development_dependency "rspec", "~> 2.0"
     g.add_development_dependency "mocha", "~> 0.9"
+    g.add_development_dependency "jasmine", "~> 1.0"
   end
   Jeweler::GemcutterTasks.new
 rescue
@@ -44,12 +45,12 @@ namespace :js do
 
   desc 'Start test server.'
   task :test do
-    exec 'ruby -I../rocket/lib test/app.rb'
+    exec 'ruby -I../rocket/lib -Ilib test/js/app.rb'
   end
 end
 
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.pattern = 'spec/**/*_spec.rb'
+  t.pattern = 'spec/ruby/**/*_spec.rb'
   t.rspec_opts = %q[-Ilib -c -b]
 end
 

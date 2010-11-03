@@ -4,9 +4,9 @@ module Rocket
     MINOR  = 0
     TINY   = 1
     STRING = [MAJOR, MINOR, TINY].join(".")
-  end
+  end # Version
   
   def self.version # :nodoc:
     Version::STRING
-  end # Version
+  end
 end # Rocket
