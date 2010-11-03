@@ -1,24 +1,21 @@
-// The web-socket-js default configuration.
-
-// Where your WebSocketMain.swf is placed?
-var WEB_SOCKET_SWF_LOCATION = 'WebSocketMain.swf';
-// Run web socket in debug mode?
-var WEB_SOCKET_DEBUG = false;
-
-// The Rocket library.
-
+/**
+ * Rocket base class. Examples:
+ *
+ *   rocket = new Rocket('ws://host.com:8080', 'my-app'); // no trailing slash in url!
+ *   rocket = new Rocket('wss://host.com:433', 'my-secured-app');
+ *
+ * @class
+ * @constructor
+ */
 var Rocket = function(url, appID) {
   this.socketId;
-  
   this.url = url + '/app/' + appID;
   this.appID = appID;
   this.channels = new Rocket.Channels();
   this.retryCounter = 0;
   this.isConnected = false;
-  
   this.globalChannel = new Rocket.Channel();
   this.globalChannel.isGlobal = true
-
   this.connect();
 
   var self = this;
@@ -38,32 +35,29 @@ var Rocket = function(url, appID) {
 Rocket.prototype = {
   /**
    * Establish connection with specified web socket server. 
+   *
+   * @return self
    */
   connect: function() {
     Rocket.log('Rocket : connecting with ' + this.url);
     this.allowReconnect = true
-    
     var self = this;
 
     if (window["WebSocket"]) {
       this.connection = new WebSocket(this.url);
-      
-      this.connection.onmessage = function(msg) {
-        self.onmessage(msg);
-      };
-      this.connection.onclose = function() {
-        self.onclose();
-      };
-      this.connection.onopen = function() {
-        self.onopen();
-      };
+      this.connection.onmessage = function(msg) { self.onmessage(msg); };
+      this.connection.onclose = function() { self.onclose(); };
+      this.connection.onopen = function() { self.onopen(); };
     } else {
     
     }
+    return this;
   },
   
   /**
-   * Close connection with web socket server and cleanup configuration. 
+   * Close connection with web socket server and cleanup configuration.
+   *
+   * @return self
    */
   disconnect: function() {
     Rocket.log('Rocket : disconnecting');
@@ -75,12 +69,24 @@ Rocket.prototype = {
   },
   
   /**
-   * Searches for given channel and return it when exists. 
+   * Searches for given channel and return it when exists.
+   *
+   * @param {string} channelName
+   * @return Rocket.Channel 
    */
   channel: function(channelName) {
     return this.channels.find(channelName)
   },
   
+  /**
+   * Trigger given event by sending specified data.
+   *
+   *   rocket.trigger('rocket:unsubscribe', { channel: 'my-channel' });
+   *
+   * @param {string} eventName
+   * @param {Object} data
+   * @return self
+   */
   trigger: function(eventName, data) {
     if (this.isConnected) {
       var payload = JSON.stringify({ event: eventName, data: data });
@@ -92,12 +98,29 @@ Rocket.prototype = {
     return this;
   },
   
+  /**
+   * Subscribes given channel and returns this channel object.
+   *
+   *   myChannel = rocket.subscribe('my-channel');
+   *   myChannel.bind('my-event', function(data) {
+   *     // do something with received data...
+   *   });
+   *
+   * @param {string} channelName
+   * @return Rocket.Channel
+   */
   subscribe: function(channelName) {
     var channel = this.channels.add(channelName);
     this.trigger('rocket:subscribe', { channel: channelName });
     return channel;
   },
   
+  /**
+   * Subscribe all registered channels. It's usualy used to subscribe all 
+   * registered just after open connetion (or to re-subscribe after reconnect).
+   *
+   * @return void 
+   */
   subscribeAll: function() {
     for (var channel in this.channels.all) {
       if (this.channels.all.hasOwnProperty(channel)) {
@@ -116,7 +139,6 @@ Rocket.prototype = {
   
   onmessage: function(msg) {
     Rocket.log("Rocket : received message : " + msg.data)
-  
     var channel;
     var params = JSON.parse(msg.data);
     

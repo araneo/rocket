@@ -6,6 +6,9 @@
  *   channels.find('test'); 
  *   channels.remove('test');
  *   // ...
+ *
+ * @class
+ * @constructor
  */
 Rocket.Channels = function() {
   this.all = {};
@@ -14,6 +17,9 @@ Rocket.Channels = function() {
 Rocket.Channels.prototype = {
   /**
    * Append new channel to the list of registered. 
+   *
+   * @param {string} channelName
+   * @return Rocket.Channel
    */
   add: function(channelName) {
     existingChannel = this.find(channelName)
@@ -25,14 +31,20 @@ Rocket.Channels.prototype = {
   },
   
   /**
-   * Returns channel with specified name when it exists. 
+   * Returns channel with specified name when it exists.
+   *
+   * @param {string} channelName
+   * @return Rocket.Channel 
    */
   find: function(channelName) {
     return this.all[channelName];
   },
   
   /**
-   * Remove specified channel from the list.  
+   * Remove specified channel from the list.
+   *
+   * @param {string} channelName
+   * @return void  
    */
   remove: function(channelName) {
     delete this.all[channelName];
@@ -91,7 +103,7 @@ Rocket.Channel.prototype = {
       for (var i = 0; i < callbacks.length; i++) {
         callbacks[i](eventData);
       }
-    } else {
+    } else if (!this.isGlobal) {
       Rocket.log('Rocket : No callbacks for ' + eventName)
     }
     for (var i = 0; i < this.globalCallbacks.length; i++) {
@@ -99,21 +111,3 @@ Rocket.Channel.prototype = {
     }
   }
 };
-
-/*
-Pusher.Channel.prototype = {
-
-  dispatch: function(event_name, event_data) {
-    var callbacks = this.callbacks[event_name];
-
-    if (callbacks) {
-      for (var i = 0; i < callbacks.length; i++) {
-        callbacks[i](event_data);
-      }
-    } else if (!this.global) {
-      Pusher.log('Pusher : No callbacks for ' + event_name);
-    }
-  },
-
-};
-*/

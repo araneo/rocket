@@ -17,6 +17,7 @@ module Rocket
         "vendor/web-socket-js/web_socket.js",
         "rocket.core.js",
         "rocket.channels.js", 
+        "rocket.defaults.js",
       ]
 
       ASSETS = [
