@@ -1,7 +1,7 @@
 # -*- ruby -*-
 
 $:.unshift(File.expand_path('../lib', __FILE__))
-$:.unshift(File.expand_path('../rocket/lib/', __FILE__))
+$:.unshift(File.expand_path('../../rocket/lib/', __FILE__))
 
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
@@ -16,7 +16,7 @@ Rocket web socket server.
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |g|
-    g.version = Rocket.version
+    g.version = Rocket::JS.version
     g.name = "rocket-js"
     g.email = "chris@nu7hat.ch"
     g.homepage = "http://github.com/araneo/rocket"
@@ -24,8 +24,8 @@ begin
     g.summary = SUMMARY
     g.description = DESCRIPTION
     g.add_dependency "rocket", "0.0.1"
-    g.add_dependency "closure-compiler", "~> 0.3"
     g.add_dependency "json", "~> 1.4"
+    g.add_dependency "yui-compressor", "~> 0.9"
     g.add_development_dependency "rspec", "~> 2.0"
     g.add_development_dependency "mocha", "~> 0.9"
   end
@@ -39,7 +39,7 @@ namespace :js do
   task :build do
     require 'rocket-js'
     require 'rocket/js/builder'
-    Builder.new(File.dirname(__FILE__), true).generate_script
+    Rocket::JS::Builder.new(File.dirname(__FILE__), true).generate_script
   end
 
   desc 'Start test server.'
@@ -60,7 +60,7 @@ RSpec::Core::RakeTask.new(:rcov) do |t|
 end
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.title = "Rocket #{Rocket.version}"
+  rdoc.title = "Rocket JavaScript Tools #{Rocket::JS.version}"
   rdoc.rdoc_dir = 'rdoc'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')

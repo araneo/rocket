@@ -1,4 +1,4 @@
-require 'closure-compiler'
+require 'yui/compressor'
 require 'fileutils'
 require 'yaml'
 
@@ -53,8 +53,8 @@ module Rocket
       end
       
       def minify(src)
-        compiler = Closure::Compiler.new(:compilation_level => 'ADVANCED_OPTIMIZATIONS')
-        compiler.compile(src)
+        compressor = YUI::JavaScriptCompressor.new(:munge => true)
+        compressor.compress(src)
       end
       
       def save_script(source)
