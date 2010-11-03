@@ -26,11 +26,7 @@ module Rocket
         @daemon  = @options.delete(:daemon)
         
         # Remove unnecessary options. 
-        @options.delete(:verbose)
-        @options.delete(:quiet)
-        @options.delete(:log)
-        @options.delete(:apps)
-        @options.delete(:plugins)
+        @options.reject!{|k,v| [:verbose, :quiet, :log, :apps, :plugins].include?(k) }
       end
     
       def start!(&block)

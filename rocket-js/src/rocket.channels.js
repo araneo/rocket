@@ -113,12 +113,12 @@ Rocket.Channel.prototype = {
   dispatch: function(eventName, eventData) {
     var callbacks = this.callbacks[eventName]
     if (callbacks) {
-      Rocket.log('Rocket : Executing callbacks for ' + eventName)
+      Rocket.log('Rocket : executing callbacks for ' + eventName)
       for (var i = 0; i < callbacks.length; i++) {
         callbacks[i](eventData);
       }
     } else if (!this.isGlobal) {
-      Rocket.log('Rocket : No callbacks for ' + eventName)
+      Rocket.log('Rocket : no callbacks for ' + eventName)
     }
     for (var i = 0; i < this.globalCallbacks.length; i++) {
       this.globalCallbacks[i](eventName, eventData);
