@@ -8,6 +8,20 @@ var WEB_SOCKET_DEBUG = false;
 // Rocket defaults. 
  
 /**
+ * How many miliseconds system will wait until next reconnect try.  
+ * 
+ * @type integer
+ */ 
+Rocket.reconnectDelay = 5000;
+ 
+/**
+ * Allow socket reconnect?
+ *
+ * @type boolean
+ */ 
+Rocket.allowReconnect = true;
+ 
+/**
  * Default logger. You can replace it with your own, eg. 
  *
  *   Rocket.log = function(msg) { console.log(msg) };

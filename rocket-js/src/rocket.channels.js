@@ -59,6 +59,9 @@ Rocket.Channels.prototype = {
  *   channel.bind('my-event', function(data) {
  *     // do something with given data ...
  *   })
+ *
+ * @class
+ * @constructor
  */
 Rocket.Channel = function() {
   this.callbacks = {};
@@ -71,7 +74,11 @@ Rocket.Channel.prototype = {
    * to one event, eg:
    * 
    *   channel.bind('my-event', function(data){ alert('first one!') });
-   *   channel.bind('my-event', function(data){ alert('second one!') }); 
+   *   channel.bind('my-event', function(data){ alert('second one!') });
+   *
+   * @param {string} eventName
+   * @param {function} callback
+   * @return self 
    */
   bind: function(eventName, callback) {
     this.callbacks[eventName] = this.callbacks[eventName] || [];
@@ -84,6 +91,9 @@ Rocket.Channel.prototype = {
    * processing callbacks assigned to it.
    *
    *   channel.bindAll(function(event, data){ alert(event) });
+   *
+   * @param {function} callback
+   * @return self
    */
   bindAll: function(callback) {
     this.globalCallbacks.push(callback);
@@ -94,7 +104,11 @@ Rocket.Channel.prototype = {
    * Dispatch given event with passing data to all registered callbacks.
    * All global callbacks will be called here too.
    * 
-   *   channel.dispatch('my-event', {'hello': 'world'})
+   *   channel.dispatch('my-event', {'hello': 'world'});
+   *
+   * @param {string} eventName
+   * @param {Object} eventData
+   * @return void
    */
   dispatch: function(eventName, eventData) {
     var callbacks = this.callbacks[eventName]
