@@ -34,4 +34,7 @@ daemon: false
 # Here you can specify all static apps allowed to run on this server. 
 # Apps are kind of namespaces with separated authentication.
 apps:
-  test_app_key: secretkey
+  test_app_1: 
+    secret: secretkey1
+  test_app_2:
+    secret: secretkey2

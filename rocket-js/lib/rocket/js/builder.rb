@@ -1,5 +1,4 @@
 require 'closure-compiler'
-require 'sprockets'
 require 'fileutils'
 require 'yaml'
 
@@ -34,15 +33,15 @@ module Rocket
       end
       
       def generate
+        generate_script
+        copy_assets
+      end
+      
+      def generate_script
         FileUtils.mkdir_p(dest)
-        
-        # Bundle all sources
         source = bundle
         source = minify(source) if minified
-
-        # Save scripts and copy assets to destination directory
         save_script(source)
-        copy_assets
       end
       
       def bundle
