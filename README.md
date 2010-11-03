@@ -23,20 +23,20 @@ easily with rubygems (via `rocket` meta package):
 The main Rocket's feature is powerfull, event-oriented server. Here's simple
 scenario of usage:
 
-1. Generate configuration and customize it:
+Generate configuration and customize it:
 
-      $ rocket-server configure /etc/rocket/rocket.yml
+    $ rocket-server configure /etc/rocket/rocket.yml
 
-2. Run server:
+Run server:
 
-      $ rocket-server start
-      $ rocket-server start -c my-config.yml      # with other configuration
-      $ rocket-server start -h myhost.com -p 8080 # custom host and port
-      $ rocket-server start -D -v                 # verbose and debug mode
-      $ rocket-server start -d -P my.pid          # daemonized
-      ...
+    $ rocket-server start
+    $ rocket-server start -c my-config.yml      # with other configuration
+    $ rocket-server start -h myhost.com -p 8080 # custom host and port
+    $ rocket-server start -D -v                 # verbose and debug mode
+    $ rocket-server start -d -P my.pid          # daemonized
+    ...
     
-3. Play with it!
+Play with it!
 
 ## Ruby client
 
@@ -59,8 +59,8 @@ Command above will generate all necessary javascript and swf files in your
 public directory. Now you can use it in your app:
 
     <script type="text/javascript">
-      // The web-socket-js configuration.
-      WEB_SOCKET_SWF_LOCATION = 'rocket/WebSocketMain.swf';
+    
+      WEB_SOCKET_SWF_LOCATION = 'WebSocketMain.swf';
       WEB_SOCKET_DEBUG = false;
   
       rocket = new Rocket('ws://localhost:9772', 'test_app');
@@ -68,6 +68,7 @@ public directory. Now you can use it in your app:
       myChannel.bind('my-event', function(data) {
         // play with data object
       });
+      
     </script>
 
 ## Note on Patches/Pull Requests
