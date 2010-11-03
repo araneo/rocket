@@ -18,7 +18,7 @@ Rocket.Channels.prototype = {
   add: function(channelName) {
     existingChannel = this.find(channelName)
     if (!existingChannel) {
-      return (this.all[channelName] = new Pusher.Channel());
+      return (this.all[channelName] = new Rocket.Channel());
     } else {
       return existingChannel;
     }

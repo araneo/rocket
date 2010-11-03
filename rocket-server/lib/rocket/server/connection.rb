@@ -17,6 +17,8 @@ module Rocket
         :trigger_error         => "%s #%d : Invalid event's data! No channel or event name specified in: %s",
         :access_denied_error   => "%s #%d : Action can't be performed, access denied!",
         :trigger_success       => "%s #%d : Triggering '%s' on '%s' channel: %s",
+        :subscribe_error       => "%s #%d : Can't start subscription! Invalid data: %s",
+        :unsubscribe_error     => "%s #%d : Can't stop subscription! Invalid data: %s"
       }
     
       # Only connections to path matching this pattern will be accepted.
@@ -35,6 +37,7 @@ module Rocket
       
       # Starts new session for application specified in request path.
       def onopen
+        ok = false
         request["Path"] =~ APP_PATH_PATTERN
         
         if @session = Session.new($1) 
@@ -42,12 +45,18 @@ module Rocket
           
           if secret = request["Query"]["secret"]
             if @session.authenticate!(secret)
+              ok = true
               log_debug(:auth_success, app_id, signature)
             else
               log_debug(:auth_error, app_id, signature)
             end
+          else
+            ok = true
           end
         end
+        
+        send({:event => 'rocket:connected', :data => { :session_id => signature }}.to_json) if ok
+        return ok
       rescue App::NotFoundError => ex
         log_error(:app_not_found_error, signature, ex.to_s)
         close_connection
@@ -68,8 +77,8 @@ module Rocket
       def onmessage(message)
         if session? and data = JSON.parse(message)
           case data["event"]
-            when "rocket:subscribe"   then subscribe!(data)
-            when "rocket:unsubscribe" then unsubscribe!(data)
+            when "rocket:subscribe"   then subscribe!(data['data'] || {})
+            when "rocket:unsubscribe" then unsubscribe!(data['data'] || {})
           else
             trigger!(data)
           end
@@ -88,6 +97,9 @@ module Rocket
         if channel = data["channel"]
           log_debug(:subscribing_channel, app_id, signature, channel)
           @session.subscribe(channel, self)
+        else
+          log_error(:subscribe_error, app_id, signature, data.to_json)
+          false
         end
       end
       
@@ -96,6 +108,9 @@ module Rocket
         if channel = data["channel"]
           log_debug(:unsubscribing_channel, app_id, signature, channel)
           @session.unsubscribe(channel, self)
+        else
+          log_error(:unsubscribe_error, app_id, signature, data.to_json)
+          false
         end
       end
       

@@ -11,18 +11,25 @@
   WEB_SOCKET_SWF_LOCATION = 'rocket/WebSocketMain.swf';
   WEB_SOCKET_DEBUG = false;
   
-  // Build new rocket
-  rocket = new Rocket('ws://localhost:9772', 'test_app');
-  // Subscribe a channel.
-  testChannel = rocket.subscribe('test-channel');
-  // Bind callback to event. 
-  //testChannel.bind('test-event', function(data) {
-  //  alert('hello!');
-  //});
-  
+  $(document).ready(function() {
+    // Logger...
+    Rocket.log = function(msg) { $("#log").append("<li>"+msg+"</li>") };
+    
+    // Build new rocket
+    rocket = new Rocket('ws://localhost:9772', 'test_app');
+    // Subscribe a channel.
+    testChannel = rocket.subscribe('test-channel');
+    // Bind callback to event. 
+    //testChannel.bind('test-event', function(data) {
+    //  alert('hello!');
+    //});
+  });
 </script>
 </head>
 <body>
+  <ul id="log">
+  
+  <ul>
 <!--
   <h1 id="qunit-header">Pusher Tests</h1>
   <h2 id="qunit-banner"></h2>

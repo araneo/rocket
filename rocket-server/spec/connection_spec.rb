@@ -1,5 +1,9 @@
 require File.expand_path("../spec_helper", __FILE__)
 
+class Rocket::Server::Connection
+  def send(*args); end  
+end
+
 describe Rocket::Server::Connection do
   subject do
     Rocket::Server::Connection
@@ -21,14 +25,23 @@ describe Rocket::Server::Connection do
   
   describe "#onopen" do
     context "when valid app specified in request" do
+      before do
+        @conn = subject.new(1)
+        @conn.request.expects(:"[]").with("Path").returns("/app/test-app")
+        @conn.request.stubs(:"[]").with("Query").returns({})
+      end
+      
       it "should start new session for it" do
-        conn = subject.new(1)
-        conn.request.expects(:"[]").with("Path").returns("/app/test-app")
-        conn.request.stubs(:"[]").with("Query").returns({})
-        conn.onopen
-        session = conn.session
+        @conn.stubs(:send)
+        @conn.onopen
+        session = @conn.session
         session.should be_kind_of(Rocket::Server::Session)
         session.app_id.should == "test-app"
+      end
+      
+      it "should send message to connected client" do
+        @conn.expects(:send).with({:event => "rocket:connected", :data => { :session_id => 1 }}.to_json)
+        @conn.onopen.should == true
       end
     end
     
@@ -47,6 +60,7 @@ describe Rocket::Server::Connection do
         conn = subject.new(1)
         conn.request.expects(:"[]").with("Path").returns("/app/test-app")
         conn.request.stubs(:"[]").with("Query").returns("secret" => "my-secret")
+        conn.expects(:send).with({:event => "rocket:connected", :data => { :session_id => 1 }}.to_json)
         conn.onopen
         session = conn.session
         session.should be_authenticated

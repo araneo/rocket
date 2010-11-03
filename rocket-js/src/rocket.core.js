@@ -7,51 +7,40 @@ var WEB_SOCKET_DEBUG = false;
 
 // The Rocket library.
 
-var Rocket = function(url, appID, channelName) {
+var Rocket = function(url, appID) {
   this.socketId;
   
   this.url = url + '/app/' + appID;
   this.appID = appID;
   this.channels = new Rocket.Channels();
-  this.connected = false;
   this.retryCounter = 0;
+  this.isConnected = false;
   
-  this.connect();
+  this.globalChannel = new Rocket.Channel();
+  this.globalChannel.isGlobal = true
 
-  //if (channelName) {
-    //this.globalChannel = this.subscribe(channelName);
-    //this.globalChannel.isGlobal = true
-  //}
+  this.connect();
 
   var self = this;
   
-  //this.bind('pusher:connection_established', function(data) {
-  //  self.connected = true;
-  //  self.retry_counter = 0;
-  //  self.socket_id = data.socket_id;
-  //  self.subscribeAll();
-  //});
+  this.globalChannel.bind('rocket:connected', function(data) {
+    self.isConnected = true;
+    self.retryCounter = 0;
+    self.socketId = data.socket_id;
+    self.subscribeAll();
+  });
 
-  //this.bind('pusher:error', function(data) {
-  //  Pusher.log("Pusher : error : " + data.message);
-  //});
+  this.globalChannel.bind('rocket:error', function(data) {
+    //self.log("Rocket : error : " + data.message);
+  });
 };
 
 Rocket.prototype = {
   /**
-   * Stubbed logger. You should override this method with your own logger, eg.
-   * 
-   *   Rocket.log = function(msg) { console.log(msg) }; 
-   */
-  log: function(msg) {
-    // nothing to do...
-  },
-  
-  /**
    * Establish connection with specified web socket server. 
    */
   connect: function() {
-    this.log('Rocket : connecting with ' + this.url);
+    Rocket.log('Rocket : connecting with ' + this.url);
     this.allowReconnect = true
     
     var self = this;
@@ -59,11 +48,14 @@ Rocket.prototype = {
     if (window["WebSocket"]) {
       this.connection = new WebSocket(this.url);
       
-      this.connection.onmessage = function() {
+      this.connection.onmessage = function(msg) {
+        self.onmessage(msg);
       };
       this.connection.onclose = function() {
+        self.onclose();
       };
       this.connection.onopen = function() {
+        self.onopen();
       };
     } else {
     
@@ -74,8 +66,9 @@ Rocket.prototype = {
    * Close connection with web socket server and cleanup configuration. 
    */
   disconnect: function() {
-    this.log('Rocket : disconnecting');
+    Rocket.log('Rocket : disconnecting');
     this.allowReconnect = false;
+    this.isConnected = false;
     this.retryCount = 0;
     this.connection.close();
     return this;
@@ -89,19 +82,51 @@ Rocket.prototype = {
   },
   
   trigger: function(eventName, data) {
-    var payload = JSON.stringify({ event: eventName, data: data });
-    this.log("Pusher : triggering event : ", payload);
-    this.connection.send(payload);
+    if (this.isConnected) {
+      var payload = JSON.stringify({ event: eventName, data: data });
+      Rocket.log("Rocket : triggering event : " + payload);
+      this.connection.send(payload);
+    } else {
+      Rocket.log("Rocket : not connected : can't trigger event " + eventName);
+    }
     return this;
   },
   
   subscribe: function(channelName) {
     var channel = this.channels.add(channelName);
-    
-    if (this.connected) {
-      this.trigger('pusher:subscribe', { channel: channelName });
-    }
+    this.trigger('rocket:subscribe', { channel: channelName });
     return channel;
+  },
+  
+  subscribeAll: function() {
+    for (var channel in this.channels.all) {
+      if (this.channels.all.hasOwnProperty(channel)) {
+        this.subscribe(channel);
+      }
+    };
+  },
+  
+  onclose: function() {
+  
+  },
+  
+  onopen: function() {
+  
+  },
+  
+  onmessage: function(msg) {
+    Rocket.log("Rocket : received message : " + msg.data)
+  
+    var channel;
+    var params = JSON.parse(msg.data);
+    
+    if (params.channel) {
+      channel = this.channel(params.channel);
+    } else {
+      channel = this.globalChannel;
+    }
+    
+    channel.dispatch(params.event, params.data);
   },
 };
 
