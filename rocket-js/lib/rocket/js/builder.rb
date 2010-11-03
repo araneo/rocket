@@ -11,6 +11,7 @@ module Rocket
       ]
       
       SCRIPTS = [
+        "vendor/json/json2.js",
         "vendor/web-socket-js/swfobject.js",
         "vendor/web-socket-js/FABridge.js",
         "vendor/web-socket-js/web_socket.js",
