@@ -23,7 +23,7 @@ begin
     gem.authors = ["Araneo", "Chris Kowalik"]
     gem.summary = SUMMARY
     gem.description = DESCRIPTION
-    gem.add_dependency "rocket", "0.0.1"
+    #gem.add_dependency "rocket", "0.0.1"
     gem.add_dependency "optitron", "~> 0.2"
     gem.add_dependency "json", "~> 1.4"
     gem.add_dependency "eventmachine", ">= 0.12"
