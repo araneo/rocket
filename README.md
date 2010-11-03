@@ -25,16 +25,16 @@ scenario of usage:
 
 1. Generate configuration and customize it:
 
-    $ rocket-server configure /etc/rocket/rocket.yml
+      $ rocket-server configure /etc/rocket/rocket.yml
 
 2. Run server:
 
-    $ rocket-server start
-    $ rocket-server start -c my-config.yml      # with other configuration
-    $ rocket-server start -h myhost.com -p 8080 # custom host and port
-    $ rocket-server start -D -v                 # verbose and debug mode
-    $ rocket-server start -d -P my.pid          # daemonized
-    ...
+      $ rocket-server start
+      $ rocket-server start -c my-config.yml      # with other configuration
+      $ rocket-server start -h myhost.com -p 8080 # custom host and port
+      $ rocket-server start -D -v                 # verbose and debug mode
+      $ rocket-server start -d -P my.pid          # daemonized
+      ...
     
 3. Play with it!
 

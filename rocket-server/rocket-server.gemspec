@@ -21,6 +21,7 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
   ]
   s.files = [
     ".gitignore",
+     "LICENSE",
      "README.md",
      "Rakefile",
      "bin/rocket-server",
@@ -37,6 +38,7 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
      "lib/rocket/server/session.rb",
      "lib/rocket/server/templates/config.yml.tpl",
      "lib/rocket/server/version.rb",
+     "rocket-server.gemspec",
      "spec/apps_spec.rb",
      "spec/channel_spec.rb",
      "spec/cli_spec.rb",
@@ -59,7 +61,6 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<rocket>, ["= 0.0.1"])
       s.add_runtime_dependency(%q<optitron>, ["~> 0.2"])
       s.add_runtime_dependency(%q<json>, ["~> 1.4"])
       s.add_runtime_dependency(%q<eventmachine>, [">= 0.12"])
@@ -70,7 +71,6 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
       s.add_development_dependency(%q<rspec>, ["~> 2.0"])
       s.add_development_dependency(%q<mocha>, ["~> 0.9"])
     else
-      s.add_dependency(%q<rocket>, ["= 0.0.1"])
       s.add_dependency(%q<optitron>, ["~> 0.2"])
       s.add_dependency(%q<json>, ["~> 1.4"])
       s.add_dependency(%q<eventmachine>, [">= 0.12"])
@@ -82,7 +82,6 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
       s.add_dependency(%q<mocha>, ["~> 0.9"])
     end
   else
-    s.add_dependency(%q<rocket>, ["= 0.0.1"])
     s.add_dependency(%q<optitron>, ["~> 0.2"])
     s.add_dependency(%q<json>, ["~> 1.4"])
     s.add_dependency(%q<eventmachine>, [">= 0.12"])
