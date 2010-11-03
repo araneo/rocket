@@ -20,5 +20,5 @@ pkg
 
 ## PROJECT::SPECIFIC
 *.rdb
-test/public/rocket
+test/public/testing
 config/config.yml
