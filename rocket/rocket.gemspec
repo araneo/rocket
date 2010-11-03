@@ -23,12 +23,17 @@ by awesome PusherApp.
   ]
   s.files = [
     ".gitignore",
+     "LICENSE",
      "README.md",
      "Rakefile",
      "bin/rocket",
      "lib/rocket.rb",
+     "lib/rocket/channel.rb",
+     "lib/rocket/client.rb",
      "lib/rocket/helpers.rb",
      "lib/rocket/version.rb",
+     "lib/rocket/websocket.rb",
+     "rocket.gemspec",
      "spec/helpers_spec.rb",
      "spec/rocket_spec.rb",
      "spec/spec_helper.rb"
