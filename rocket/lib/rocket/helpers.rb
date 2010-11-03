@@ -19,13 +19,5 @@ module Rocket
       end
     end
     
-    %w[ info debug warn error fatal ].each do |level|
-      define_method("log_#{level}") do |*args|
-        message = args.shift
-        message = self.class::LOG_MESSAGES[message] if message.is_a?(Symbol)
-        log.send(level, message % args)
-      end
-    end
-    
   end # Helpers
 end # Rocket

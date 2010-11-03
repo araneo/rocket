@@ -7,9 +7,8 @@ require 'json'
 require 'yaml'
 
 module Rocket
-  autoload :Helpers,    "rocket/helpers"
-  
   module Server
+  
     autoload :Helpers,    "rocket/server/helpers"
     autoload :CLI,        "rocket/server/cli"
     autoload :Runner,     "rocket/server/runner"
@@ -79,6 +78,7 @@ module Rocket
         logger.level = :info
         logger
       end
+      
     end # << self
   end # Server
 end # Rocket

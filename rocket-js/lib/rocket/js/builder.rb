@@ -15,8 +15,8 @@ module Rocket
         "vendor/web-socket-js/swfobject.js",
         "vendor/web-socket-js/FABridge.js",
         "vendor/web-socket-js/web_socket.js",
-        "rocket.channels.js", 
         "rocket.core.js",
+        "rocket.channels.js", 
       ]
 
       ASSETS = [
@@ -46,7 +46,7 @@ module Rocket
       
       def bundle
         SCRIPTS.map {|script|
-          source = "/* #{script} */"
+          source = "/* #{File.basename(script)} */\n"
           source += File.read(File.expand_path("../../../../src/#{script}", __FILE__))
           source
         }.join("\n\n")
@@ -58,8 +58,8 @@ module Rocket
       end
       
       def save_script(source)
-        puts dest
-        File.open(File.expand_path("rocket#{'.min' if minified}.js", dest), 'w+') {|f|
+        scriptname = "rocket-#{Rocket::JS.version}#{'.min' if minified}.js"
+        File.open(File.expand_path(scriptname, dest), 'w+') {|f|
           contents = CONTENTS.map {|content|
             File.read(File.expand_path("../../../../src/#{content}", __FILE__))
           }.join("\n\n").sub(/<%= VERSION %>/, Rocket::JS.version)

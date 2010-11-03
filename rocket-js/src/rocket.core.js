@@ -1,3 +1,12 @@
+// The web-socket-js default configuration.
+
+// Where your WebSocketMain.swf is placed?
+var WEB_SOCKET_SWF_LOCATION = 'WebSocketMain.swf';
+// Run web socket in debug mode?
+var WEB_SOCKET_DEBUG = false;
+
+// The Rocket library.
+
 var Rocket = function(url, appID, channelName) {
   this.socketId;
   
@@ -9,10 +18,10 @@ var Rocket = function(url, appID, channelName) {
   
   this.connect();
 
-  if (channelName) {
+  //if (channelName) {
     //this.globalChannel = this.subscribe(channelName);
     //this.globalChannel.isGlobal = true
-  }
+  //}
 
   var self = this;
   
@@ -28,9 +37,75 @@ var Rocket = function(url, appID, channelName) {
   //});
 };
 
-// Rocket defaults
-Rocket.allowReconnect = true;
-Rocket.log = function(){}; // eg. function(m){ console.log(m) }
+Rocket.prototype = {
+  /**
+   * Stubbed logger. You should override this method with your own logger, eg.
+   * 
+   *   Rocket.log = function(msg) { console.log(msg) }; 
+   */
+  log: function(msg) {
+    // nothing to do...
+  },
+  
+  /**
+   * Establish connection with specified web socket server. 
+   */
+  connect: function() {
+    this.log('Rocket : connecting with ' + this.url);
+    this.allowReconnect = true
+    
+    var self = this;
+
+    if (window["WebSocket"]) {
+      this.connection = new WebSocket(this.url);
+      
+      this.connection.onmessage = function() {
+      };
+      this.connection.onclose = function() {
+      };
+      this.connection.onopen = function() {
+      };
+    } else {
+    
+    }
+  },
+  
+  /**
+   * Close connection with web socket server and cleanup configuration. 
+   */
+  disconnect: function() {
+    this.log('Rocket : disconnecting');
+    this.allowReconnect = false;
+    this.retryCount = 0;
+    this.connection.close();
+    return this;
+  },
+  
+  /**
+   * Searches for given channel and return it when exists. 
+   */
+  channel: function(channelName) {
+    return this.channels.find(channelName)
+  },
+  
+  trigger: function(eventName, data) {
+    var payload = JSON.stringify({ event: eventName, data: data });
+    this.log("Pusher : triggering event : ", payload);
+    this.connection.send(payload);
+    return this;
+  },
+  
+  subscribe: function(channelName) {
+    var channel = this.channels.add(channelName);
+    
+    if (this.connected) {
+      this.trigger('pusher:subscribe', { channel: channelName });
+    }
+    return channel;
+  },
+};
+
+// Rocket default configuration.
 
 /*
 Pusher.prototype = {

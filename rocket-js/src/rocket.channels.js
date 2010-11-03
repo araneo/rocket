@@ -53,7 +53,7 @@ Rocket.Channel = function() {
   this.globalCallbacks = [];
 };
 
-Rocket.Channel.prototype = function() {
+Rocket.Channel.prototype = {
   /**
    * Assign callback to given event. More than one callback can be assigned
    * to one event, eg:
@@ -94,7 +94,7 @@ Rocket.Channel.prototype = function() {
     } else {
       Rocket.log('Rocket : No callbacks for ' + eventName)
     }
-    for (var i = 0; i < this.globalCallbacks.length; i+=) {
+    for (var i = 0; i < this.globalCallbacks.length; i++) {
       this.globalCallbacks[i](eventName, eventData);
     }
   }

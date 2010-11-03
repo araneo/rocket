@@ -5,7 +5,7 @@ require 'sinatra'
 require 'erb'
 require 'rocket-js'
 
-Rocket::JS::Builder.new(File.expand_path("../public/rocket", __FILE__), false).generate
+Rocket::JS::Builder.new(File.expand_path("../public/testing", __FILE__), false).generate
 
 get '/' do
   erb :index

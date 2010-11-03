@@ -1,0 +1,56 @@
+# -*- ruby -*-
+
+$:.unshift(File.expand_path('../lib', __FILE__))
+
+require 'rspec/core/rake_task'
+require 'rake/rdoctask'
+require 'rocket/version'
+
+SUMMARY = %Q{Event-oriented WebSockets server and toolkit.}
+DESCRIPTION = %Q{
+Rocket is a very fast and reliable web socket server built upon em-websockets library.
+Rocket provides also JavaScript toolkit to serve up instructions to clients, and
+ruby library which handles events triggering. This Project was strongly inspired 
+by awesome PusherApp.
+}
+
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |g|
+    g.version = Rocket.version
+    g.name = "rocket"
+    g.email = "chris@nu7hat.ch"
+    g.homepage = "http://github.com/araneo/rocket"
+    g.authors = ["Araneo", "Chris Kowalik"]
+    g.summary = SUMMARY
+    g.description = DESCRIPTION
+    g.add_dependency "rocket-server", "0.1.1"
+    g.add_dependency "rocket-js", "0.0.1"
+    g.add_dependency "json", "~> 1.4"
+    g.add_development_dependency "rspec", "~> 2.0"
+    g.add_development_dependency "mocha", "~> 0.9"
+  end
+  Jeweler::GemcutterTasks.new
+rescue
+  puts 'Jeweler is not available here'
+end
+
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'spec/**/*_spec.rb'
+  t.rspec_opts = %q[-Ilib -c -b]
+end
+
+RSpec::Core::RakeTask.new(:rcov) do |t|
+  t.rcov = true
+  t.rspec_opts = %q[-Ilib -c -b]
+  t.rcov_opts = %q[-Ilib -T -x "spec"]
+end
+
+Rake::RDocTask.new do |rdoc|
+  rdoc.title = "Rocket #{Rocket.version}"
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+task :default => :spec
