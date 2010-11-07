@@ -9,47 +9,19 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Araneo", "Chris Kowalik"]
-  s.date = %q{2010-11-03}
+  s.date = %q{2010-11-04}
+  s.default_executable = %q{rocket-js}
   s.description = %q{
 This library is client that allows JavaScript clients to connect to the 
 Rocket web socket server.
 }
   s.email = %q{chris@nu7hat.ch}
+  s.executables = ["rocket-js"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"
   ]
-  s.files = [
-    ".gitignore",
-     "LICENSE",
-     "README.md",
-     "Rakefile",
-     "bin/rocket-js",
-     "lib/rocket-js.rb",
-     "lib/rocket/js.rb",
-     "lib/rocket/js/builder.rb",
-     "lib/rocket/js/cli.rb",
-     "lib/rocket/js/version.rb",
-     "rocket-0.0.1.min.js",
-     "rocket-js.gemspec",
-     "spec/js/app.rb",
-     "spec/js/public/WebSocketMain.swf",
-     "spec/js/public/favicon.ico",
-     "spec/js/public/jquery-1.4.2.min.js",
-     "spec/js/public/qunit.css",
-     "spec/js/public/qunit.js",
-     "spec/js/public/test.js",
-     "spec/js/public/testing/WebSocketMain.swf",
-     "spec/js/public/testing/WebSocketMainInsecure.zip",
-     "spec/js/public/testing/rocket-0.0.1.js",
-     "spec/js/views/index.erb",
-     "spec/ruby/spec_helper.rb",
-     "src/rocket.channels.js",
-     "src/rocket.core.js",
-     "src/rocket.defaults.js",
-     "src/rocket.license.js",
-     "src/vendor/json/json2.js"
-  ]
+  s.files = Dir[File.join(File.dirname(__FILE__), "**/*")].to_a
   s.homepage = %q{http://github.com/araneo/rocket}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]

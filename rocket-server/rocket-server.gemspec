@@ -9,12 +9,14 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Araneo", "Chris Kowalik"]
-  s.date = %q{2010-11-03}
+  s.date = %q{2010-11-04}
+  s.default_executable = %q{rocket-server}
   s.description = %q{
 This is a fast web socket server built on awesome EventMachine with em-websockets help. 
 It provides easy to use, event-oriented middleware for your web-socket powered applications.    
 }
   s.email = %q{chris@nu7hat.ch}
+  s.executables = ["rocket-server"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"

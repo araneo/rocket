@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Araneo", "Chris Kowalik"]
-  s.date = %q{2010-11-03}
+  s.date = %q{2010-11-04}
+  s.default_executable = %q{rocket}
   s.description = %q{
 Rocket is a very fast and reliable web socket server built upon em-websockets library.
 Rocket provides also JavaScript toolkit to serve up instructions to clients, and
@@ -17,6 +18,7 @@ ruby library which handles events triggering. This Project was strongly inspired
 by awesome PusherApp.
 }
   s.email = %q{chris@nu7hat.ch}
+  s.executables = ["rocket"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"

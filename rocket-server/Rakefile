@@ -15,24 +15,25 @@ It provides easy to use, event-oriented middleware for your web-socket powered a
 
 begin
   require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.version = Rocket::Server.version
-    gem.name = "rocket-server"
-    gem.email = "chris@nu7hat.ch"
-    gem.homepage = "http://github.com/araneo/rocket"
-    gem.authors = ["Araneo", "Chris Kowalik"]
-    gem.summary = SUMMARY
-    gem.description = DESCRIPTION
-    #gem.add_dependency "rocket", "0.0.1"
-    gem.add_dependency "optitron", "~> 0.2"
-    gem.add_dependency "json", "~> 1.4"
-    gem.add_dependency "eventmachine", ">= 0.12"
-    gem.add_dependency "em-websocket", ">= 0.1.4"
-    gem.add_dependency "logging", "~> 1.4"
-    gem.add_dependency "daemons", "~> 1.1"
-    gem.add_dependency "konfigurator", ">= 0.1.1"
-    gem.add_development_dependency "rspec", "~> 2.0"
-    gem.add_development_dependency "mocha", "~> 0.9"
+  Jeweler::Tasks.new do |g|
+    g.version = Rocket::Server.version
+    g.name = "rocket-server"
+    g.email = "chris@nu7hat.ch"
+    g.homepage = "http://github.com/araneo/rocket"
+    g.authors = ["Araneo", "Chris Kowalik"]
+    g.summary = SUMMARY
+    g.description = DESCRIPTION
+    g.executables = %w[rocket-server]
+    #g.add_dependency "rocket", "0.0.1"
+    g.add_dependency "optitron", "~> 0.2"
+    g.add_dependency "json", "~> 1.4"
+    g.add_dependency "eventmachine", ">= 0.12"
+    g.add_dependency "em-websocket", ">= 0.1.4"
+    g.add_dependency "logging", "~> 1.4"
+    g.add_dependency "daemons", "~> 1.1"
+    g.add_dependency "konfigurator", ">= 0.1.1"
+    g.add_development_dependency "rspec", "~> 2.0"
+    g.add_development_dependency "mocha", "~> 0.9"
   end
   Jeweler::GemcutterTasks.new
 rescue

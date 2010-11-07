@@ -23,6 +23,9 @@ begin
     g.authors = ["Araneo", "Chris Kowalik"]
     g.summary = SUMMARY
     g.description = DESCRIPTION
+    g.executables = %w[rocket-js]
+    g.files += Dir[File.join(File.dirname(__FILE__) + "../src/**/*")]
+    g.files += Dir[File.join(File.dirname(__FILE__) + "../src/vendor/web-socket-js/**/*")]
     #g.add_dependency "rocket", "0.0.1"
     g.add_dependency "json", "~> 1.4"
     g.add_dependency "yui-compressor", "~> 0.9"

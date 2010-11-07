@@ -4,6 +4,7 @@ module Rocket
   class Channel
   
     attr_reader :client
+    attr_reader :channel
   
     def initialize(client, channel)
       @client  = client
