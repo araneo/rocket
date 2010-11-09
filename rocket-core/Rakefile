@@ -25,19 +25,19 @@ end
 
 desc "Build current version as a rubygem"
 task :build do
-  `gem build rocket-core.gemspec`
-  `mkdir -p pkg`
-  `mv rocket-core-*.gem pkg/`
+  sh "gem build rocket-core.gemspec"
+  sh "mkdir -p pkg"
+  sh "mv rocket-core-*.gem pkg/"
 end
 
 desc "Relase current version to rubygems.org"
 task :release => :build do
-  `gem push pkg/rocket-core-#{Rocket.version}.gem`
+  sh "gem push pkg/rocket-core-#{Rocket.version}.gem"
 end
 
 desc "Perform installation via rubygems"
 task :install => :build do
-  `gem install pkg/rocket-core-#{Rocket.version}.gem`
+  sh "gem install pkg/rocket-core-#{Rocket.version}.gem"
 end
 
 task :default => :spec

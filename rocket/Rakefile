@@ -1,18 +1,19 @@
 # -*- ruby -*-
 $:.unshift(File.expand_path('../lib', __FILE__))
+$:.unshift(File.expand_path('../../rocket-core/lib', __FILE__))
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
 require 'rocket/version'
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
-  t.rspec_opts = %q[-I../rocket/lib -Ilib -c -b]
+  t.rspec_opts = %q[-I../rocket-core/lib -Ilib -c -b]
 end
 
 RSpec::Core::RakeTask.new(:rcov) do |t|
   t.rcov = true
-  t.rspec_opts = %q[-I../rocket/lib -Ilib -c -b]
-  t.rcov_opts = %q[-I../rocket/lib -Ilib -T -x "spec"]
+  t.rspec_opts = %q[-I../rocket-core/lib -Ilib -c -b]
+  t.rcov_opts = %q[-I../rocket-core/lib -Ilib -T -x "spec"]
 end
 
 Rake::RDocTask.new do |rdoc|
@@ -24,19 +25,19 @@ end
 
 desc "Build current version as a rubygem"
 task :build do
-  `gem build rocket.gemspec`
-  `mkdir -p pkg`
-  `mv rocket-*.gem pkg/`
+  sh "gem build rocket.gemspec"
+  sh "mkdir -p pkg"
+  sh "mv rocket-*.gem pkg/"
 end
 
 desc "Relase current version to rubygems.org"
 task :release => :build do
-  `gem push pkg/rocket-#{Rocket.version}.gem`
+  sh "gem push pkg/rocket-#{Rocket.version}.gem"
 end
 
 desc "Perform installation via rubygems"
 task :install => :build do
-  `gem install pkg/rocket-#{Rocket.version}.gem`
+  sh "gem install pkg/rocket-#{Rocket.version}.gem"
 end
 
 task :default => :spec

@@ -5,10 +5,6 @@ describe Rocket::Server do
     Rocket::Server
   end
   
-  it ".version should be valid" do
-    subject.version.should =~ /\d+(.\d+){1,2}.*/
-  end
-  
   describe ".logger=" do
     it "should set given logger" do
       subject.logger = :testing
