@@ -8,7 +8,7 @@ module Rocket
       
       desc "Show used version of Rocket server"
       def version
-        puts "Rocket v#{Rocket::Server.version}"
+        puts "Rocket v#{Rocket.version}"
       end
       
       desc "Start Rocket server on given host and port"

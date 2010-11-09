@@ -3,7 +3,7 @@ $:.unshift(File.expand_path('../lib', __FILE__))
 $:.unshift(File.expand_path('../../rocket/lib/', __FILE__))
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
-require 'rocket/js/version'
+require 'rocket/version'
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/ruby/**/*_spec.rb'
@@ -46,7 +46,7 @@ end
 namespace :js do
   desc 'Bundle and minify source files.'
   task :build do
-    require 'rocket/js/builder'
+    require 'rocket-js'
     Rocket::JS::Builder.new(File.dirname(__FILE__), true).generate_script
   end
 

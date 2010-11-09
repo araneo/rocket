@@ -4,5 +4,3 @@ module Rocket
     autoload :CLI,     'rocket/js/cli'
   end # JS
 end # Rocket
-
-require 'rocket/js/version'

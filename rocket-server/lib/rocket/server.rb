@@ -82,6 +82,3 @@ module Rocket
     end # << self
   end # Server
 end # Rocket
-
-require 'rocket/server/version'
-

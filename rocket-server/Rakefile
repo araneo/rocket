@@ -1,44 +1,9 @@
 # -*- ruby -*-
-
 $:.unshift(File.expand_path('../lib', __FILE__))
 $:.unshift(File.expand_path('../../rocket/lib', __FILE__))
-
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
-require 'rocket/server/version'
-
-SUMMARY = %Q{Fast and extensible web socket server built upon em-websockets.}
-DESCRIPTION = %Q{
-This is a fast web socket server built on awesome EventMachine with em-websockets help. 
-It provides easy to use, event-oriented middleware for your web-socket powered applications.    
-}
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |g|
-    g.version = Rocket::Server.version
-    g.name = "rocket-server"
-    g.email = "chris@nu7hat.ch"
-    g.homepage = "http://github.com/araneo/rocket"
-    g.authors = ["Araneo", "Chris Kowalik"]
-    g.summary = SUMMARY
-    g.description = DESCRIPTION
-    g.executables = %w[rocket-server]
-    #g.add_dependency "rocket", "0.0.1"
-    g.add_dependency "optitron", "~> 0.2"
-    g.add_dependency "json", "~> 1.4"
-    g.add_dependency "eventmachine", ">= 0.12"
-    g.add_dependency "em-websocket", ">= 0.1.4"
-    g.add_dependency "logging", "~> 1.4"
-    g.add_dependency "daemons", "~> 1.1"
-    g.add_dependency "konfigurator", ">= 0.1.1"
-    g.add_development_dependency "rspec", "~> 2.0"
-    g.add_development_dependency "mocha", "~> 0.9"
-  end
-  Jeweler::GemcutterTasks.new
-rescue
-  puts 'Jeweler is not available here'
-end
+require 'rocket/version'
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
@@ -56,6 +21,26 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+desc "Build current version as a rubygem"
+task :build do
+  `gem build rocket-server.gemspec`
+  `mkdir -p pkg`
+  `mv rocket-server-*.gem pkg/`
+end
+
+desc "Relase current version to rubygems.org"
+task :release => :build do
+  `git tag -am "Version bump to #{Rocket.version}" v#{Rocket.version}`
+  `git push origin master`
+  `git push origin master --tags`
+  `gem push pkg/rocket-server-#{Rocket.version}.gem`
+end
+
+desc "Perform installation via rubygems"
+task :install => :build do
+  `gem install pkg/rocket-server-#{Rocket.version}.gem`
 end
 
 task :default => :spec
