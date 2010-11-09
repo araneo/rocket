@@ -1,6 +1,5 @@
 # -*- ruby -*-
 $:.unshift(File.expand_path('../lib', __FILE__))
-$:.unshift(File.expand_path('../../rocket/lib', __FILE__))
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
 require 'rocket/version'
@@ -17,7 +16,7 @@ RSpec::Core::RakeTask.new(:rcov) do |t|
 end
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.title = "Rocket core #{Rocket.version}"
+  rdoc.title = "Rocket #{Rocket.version}"
   rdoc.rdoc_dir = 'rdoc'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
@@ -25,19 +24,19 @@ end
 
 desc "Build current version as a rubygem"
 task :build do
-  `gem build rocket-core.gemspec`
+  `gem build rocket.gemspec`
   `mkdir -p pkg`
-  `mv rocket-core-*.gem pkg/`
+  `mv rocket-*.gem pkg/`
 end
 
 desc "Relase current version to rubygems.org"
 task :release => :build do
-  `gem push pkg/rocket-core-#{Rocket.version}.gem`
+  `gem push pkg/rocket-#{Rocket.version}.gem`
 end
 
 desc "Perform installation via rubygems"
 task :install => :build do
-  `gem install pkg/rocket-core-#{Rocket.version}.gem`
+  `gem install pkg/rocket-#{Rocket.version}.gem`
 end
 
 task :default => :spec

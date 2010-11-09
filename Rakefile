@@ -1,6 +1,6 @@
 # -*- ruby -*-
 
-COMPONENTS = %w[rocket rocket-core rocket-server rocket-js]
+COMPONENTS = %w[rocket-core rocket-server rocket-js rocket]
 
 desc "Build current version as a rubygem"
 task :build do
@@ -12,7 +12,6 @@ task :release => :build do
   `git tag -am "Version bump to #{Rocket.version}" v#{Rocket.version}`
   `git push origin master`
   `git push origin master --tags`
-  
   COMPONENTS.each {|component| `cd #{component}; rake release; cd ..` }
 end
 

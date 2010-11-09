@@ -1,24 +1,13 @@
-## MAC OS
 .DS_Store
-
-## TEXTMATE
 *.tmproj
 tmtags
-
-## EMACS
 *~
 \#*
 .\#*
-
-## VIM
 *.swp
-
-## PROJECT::GENERAL
 coverage
 rdoc
 pkg
-
-## PROJECT::SPECIFIC
 *.rdb
 test/public/testing
 config/config.yml
