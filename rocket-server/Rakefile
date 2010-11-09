@@ -17,7 +17,7 @@ RSpec::Core::RakeTask.new(:rcov) do |t|
 end
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.title = "Rocket server #{Rocket::Server.version}"
+  rdoc.title = "Rocket Server #{Rocket.version}"
   rdoc.rdoc_dir = 'rdoc'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
