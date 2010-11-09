@@ -1,56 +1,9 @@
 # -*- ruby -*-
-
 $:.unshift(File.expand_path('../lib', __FILE__))
 $:.unshift(File.expand_path('../../rocket/lib/', __FILE__))
-
 require 'rspec/core/rake_task'
 require 'rake/rdoctask'
 require 'rocket/js/version'
-
-SUMMARY = %Q{JavaScript client library for Rocket server.}
-DESCRIPTION = %Q{
-This library is client that allows JavaScript clients to connect to the 
-Rocket web socket server.
-}
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |g|
-    g.version = Rocket::JS.version
-    g.name = "rocket-js"
-    g.email = "chris@nu7hat.ch"
-    g.homepage = "http://github.com/araneo/rocket"
-    g.authors = ["Araneo", "Chris Kowalik"]
-    g.summary = SUMMARY
-    g.description = DESCRIPTION
-    g.executables = %w[rocket-js]
-    g.files += Dir[File.join(File.dirname(__FILE__) + "../src/**/*")]
-    g.files += Dir[File.join(File.dirname(__FILE__) + "../src/vendor/web-socket-js/**/*")]
-    #g.add_dependency "rocket", "0.0.1"
-    g.add_dependency "json", "~> 1.4"
-    g.add_dependency "yui-compressor", "~> 0.9"
-    g.add_development_dependency "rspec", "~> 2.0"
-    g.add_development_dependency "mocha", "~> 0.9"
-    g.add_development_dependency "jasmine", "~> 1.0"
-  end
-  Jeweler::GemcutterTasks.new
-rescue
-  puts 'Jeweler is not available here'
-end
-
-namespace :js do
-  desc 'Bundle and minify source files.'
-  task :build do
-    require 'rocket-js'
-    require 'rocket/js/builder'
-    Rocket::JS::Builder.new(File.dirname(__FILE__), true).generate_script
-  end
-
-  desc 'Start test server.'
-  task :test do
-    exec 'ruby -I../rocket/lib -Ilib test/js/app.rb'
-  end
-end
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/ruby/**/*_spec.rb'
@@ -64,10 +17,43 @@ RSpec::Core::RakeTask.new(:rcov) do |t|
 end
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.title = "Rocket JavaScript Tools #{Rocket::JS.version}"
+  rdoc.title = "Rocket JavaScript Tools #{Rocket.version}"
   rdoc.rdoc_dir = 'rdoc'
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+desc "Build current version as a rubygem"
+task :build do
+  `gem build rocket-js.gemspec`
+  `mkdir -p pkg`
+  `mv rocket-js-*.gem pkg/`
+end
+
+desc "Relase current version to rubygems.org"
+task :release => :build do
+  `git tag -am "Version bump to #{Rocket.version}" v#{Rocket.version}`
+  `git push origin master`
+  `git push origin master --tags`
+  `gem push pkg/rocket-js-#{Rocket.version}.gem`
+end
+
+desc "Perform installation via rubygems"
+task :install => :build do
+  `gem install pkg/rocket-js-#{Rocket.version}.gem`
+end
+
+namespace :js do
+  desc 'Bundle and minify source files.'
+  task :build do
+    require 'rocket/js/builder'
+    Rocket::JS::Builder.new(File.dirname(__FILE__), true).generate_script
+  end
+
+  desc 'Start test server.'
+  task :test do
+    exec 'ruby -I../rocket/lib -Ilib test/js/app.rb'
+  end
 end
 
 task :default => :spec

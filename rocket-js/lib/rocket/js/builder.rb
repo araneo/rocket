@@ -59,11 +59,11 @@ module Rocket
       end
       
       def save_script(source)
-        scriptname = "rocket-#{Rocket::JS.version}#{'.min' if minified}.js"
+        scriptname = "rocket-#{Rocket.version}#{'.min' if minified}.js"
         File.open(File.expand_path(scriptname, dest), 'w+') {|f|
           contents = CONTENTS.map {|content|
             File.read(File.expand_path("../../../../src/#{content}", __FILE__))
-          }.join("\n\n").sub(/<%= VERSION %>/, Rocket::JS.version)
+          }.join("\n\n").sub(/<%= VERSION %>/, Rocket.version)
 
           f.write(contents)
           f.write("\n\n")

@@ -6,7 +6,7 @@ module Rocket
       
       desc "Show version of used javascript library"
       def version
-        puts "Rocket javascript library v#{Rocket::JS.version}"
+        puts "Rocket javascript library v#{Rocket.version}"
       end
       
       desc "Generate Rocket's javascript toolkit in given directory"
