@@ -32,9 +32,6 @@ end
 
 desc "Relase current version to rubygems.org"
 task :release => :build do
-  `git tag -am "Version bump to #{Rocket.version}" v#{Rocket.version}`
-  `git push origin master`
-  `git push origin master --tags`
   `gem push pkg/rocket-server-#{Rocket.version}.gem`
 end
 
