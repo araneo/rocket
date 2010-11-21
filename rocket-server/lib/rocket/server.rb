@@ -1,3 +1,11 @@
+begin
+  require 'fastthread'
+rescue
+  puts "WARNING: You don't have fastthread gem installed. It's recommended" +
+       "to use it for better performance."
+  require 'thread'
+end
+
 require "konfigurator"
 require 'eventmachine'
 require 'em-websocket'
