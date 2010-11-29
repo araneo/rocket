@@ -1,6 +1,6 @@
 begin
   require 'fastthread'
-rescue
+rescue LoadError
   puts "WARNING: You don't have fastthread gem installed. It's recommended" +
        "to use it for better performance."
   require 'thread'
