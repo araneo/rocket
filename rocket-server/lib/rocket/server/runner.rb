@@ -56,7 +56,7 @@ module Rocket
           Process.kill(9, pid)
           pid
         end
-      rescue => e
+      rescue Object => e
         # nothing to show
       end
       
@@ -68,7 +68,7 @@ module Rocket
       def save_pid
         FileUtils.mkdir_p(File.dirname(pidfile))
         File.open(pidfile, "w+"){|f| f.write("#{Process.pid}\n")}
-      rescue => e
+      rescue Object => e
         puts e.to_s
         exit 1
       end
