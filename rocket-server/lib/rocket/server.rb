@@ -36,8 +36,8 @@ module Rocket
     disable :verbose
     disable :quiet
     disable :daemon
-    set :pid, nil
-    set :log, nil
+    set :pid, "/var/run/rocket/server.pid"
+    set :log, "/var/log/rocket/server.log"
     set :tls_options, {}
     set :apps, []
     set :plugins, []

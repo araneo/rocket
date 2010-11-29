@@ -2,8 +2,8 @@
 require File.expand_path('../../load_paths', __FILE__)
 require 'rocket/version'
 
-$LIB_BASENAME = "rocket-core"
+$LIB_BASENAME = "rocket-server"
 $LIB_FULLNAME = "#{$LIB_BASENAME}-#{Rocket.version}"
-$LIB_TITLE    = "Rocket Core #{Rocket.version}"
+$LIB_TITLE    = "Rocket Server #{Rocket.version}"
 
 load File.expand_path('../../Rakefile.common', __FILE__)

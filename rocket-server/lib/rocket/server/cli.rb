@@ -8,29 +8,30 @@ module Rocket
       
       desc "Show used version of Rocket server"
       def version
-        puts "Rocket v#{Rocket.version}"
+        puts "Rocket Server v#{Rocket.version}"
       end
       
       desc "Start Rocket server on given host and port"
-      opt "config",  :short_name => "c", :default => "/etc/rocket/default.yml",    :desc => "Path to configuration file" 
-      opt "host",    :short_name => "h", :default => "localhost",                  :desc => "Specify server host"
-      opt "port",    :short_name => "p", :default => 9772,                         :desc => "Specify server port"
-      opt "plugins", :short_name => "r", :default => [],                           :desc => "Require ruby extensions at runtime"
-      opt "secure",  :short_name => "s", :default => false,                        :desc => "Switch between wss/ws modes"
-      opt "verbose", :short_name => "v", :default => false,                        :desc => "Increase verbosity"
-      opt "quiet",   :short_name => "q", :default => false,                        :desc => "Decrease verbosity"
-      opt "debug",   :short_name => "D", :default => false,                        :desc => "Run server in debug mode"
-      opt "daemon",  :short_name => "d", :default => false,                        :desc => "Run server as a daemon"
-      opt "pid",     :short_name => "P", :default => "/var/run/rocket/server.pid", :desc => "Path to PID file (only when daemonized)"
-      opt "log",     :short_name => "l", :default => nil,                          :desc => "Path to log file"
+      opt "config",  :short_name => "c", :desc => "Path to configuration file" 
+      opt "host",    :short_name => "h", :desc => "Specify server host"
+      opt "port",    :short_name => "p", :desc => "Specify server port"
+      opt "plugins", :short_name => "r", :desc => "Require ruby extensions at runtime"
+      opt "secure",  :short_name => "s", :desc => "Switch between wss/ws modes"
+      opt "verbose", :short_name => "v", :desc => "Increase verbosity"
+      opt "quiet",   :short_name => "q", :desc => "Decrease verbosity"
+      opt "debug",   :short_name => "D", :desc => "Run server in debug mode"
+      opt "daemon",  :short_name => "d", :desc => "Run server as a daemon"
+      opt "pid",     :short_name => "P", :desc => "Path to PID file (only when daemonized)"
+      opt "log",     :short_name => "l", :desc => "Path to log file"
       def start
-        Rocket::Server.load_settings(params.delete('config'), symbolize_keys(params))
+        config_file = params.delete('config') || '/etc/rocket/default.yml'
+        Rocket::Server.load_settings(config_file, symbolize_keys(params))
         Rocket::Server::Runner.new(Rocket::Server.settings).start!
       end
       
       desc "Stop daemonized instance of Rocket server"
-      opt "config",  :short_name => "c", :default => "/etc/rocket/default.yml",    :desc => "Path to configuration file" 
-      opt "pid",     :short_name => "P", :default => "/var/run/rocket/server.pid", :desc => "Path to PID file (only when daemonized)"
+      opt "config",  :short_name => "c", :desc => "Path to configuration file" 
+      opt "pid",     :short_name => "P", :desc => "Path to PID file (only when daemonized)"
       def stop
         Rocket::Server.load_settings(params.delete('config'), symbolize_keys(params))
         
