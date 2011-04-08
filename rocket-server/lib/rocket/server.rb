@@ -70,7 +70,7 @@ module Rocket
       alias_method :load_settings, :load_settings_with_setup
       
       def require_plugins
-        plugins.to_a.each {|plugin| require plugin }
+        plugins.to_a.each {|plugin| require plugin } if plugins
       end
       
       def configure_logger
