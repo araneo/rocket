@@ -38,6 +38,10 @@ module Rocket
       # Starts new session for application specified in request path.
       def onopen
         ok = false
+	# Dono why but in newer systems (like Ubuntu11) we have stuff in keys with small letters
+	request["Path"]  ||= request["path"]
+	request["Query"] ||= request["query"]
+
         request["Path"] =~ APP_PATH_PATTERN
         
         if @session = Session.new($1) 
